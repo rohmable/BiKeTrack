@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">BiKeTrack</string>
+
+    <!--  Data formats  -->
+    <string name="time_format" translatable="false">%1$02d:%2$02d:%3$02d</string>
+    <string name="speed_format" translatable="false">%1$.1f km/h</string>
+    <string name="altitude_format" translatable="false">%1$.1f m</string>
+    <string name="distance_format" translatable="false">%1$.1f km</string>
+    <string name="date_format" translatable="false">%1$s, %2$s</string>
+    <string name="length_format" translatable="false">%1$.1f h</string>
+    <string name="watts_format" translatable="false">%1$d W</string>
+
+    <!--  Default track names  -->
+    <string name="morning_track">Percorso mattutino</string>
+    <string name="afternoon_track">Percorso pomeridiano</string>
+    <string name="evening_track">Percorso serale</string>
+    <string name="night_track">Percorso notturno</string>
+
+    <!--  TracksListActivity strings  -->
+    <string name="track_open">Apri</string>
+    <string name="track_delete">Elimina</string>
+
+    <!--  RecordActivity strings  -->
+    <string name="record_track">Registra percorso</string>
+    <string name="start_recording">Inizia registrazione</string>
+    <string name="stop_recording">Termina registrazione</string>
+    <string name="recording_started">Registrazione iniziata</string>
+    <string name="recording_saved">Registrazione salvata</string>
+
+    <!--  SettingsActivity strings  -->
+    <string name="settings">Impostazioni</string>
+    <string name="your_info_header">Le tue informazioni</string>
+    <string name="height">Altezza</string>
+    <string name="weight">Peso</string>
+    <string name="data_gathering">Impostazioni di raccolta</string>
+    <string name="recording_resolution">Risoluzione registrazione (punti al secondo)</string>
+
+    <!--  TrackDetailCard strings  -->
+    <string name="avg_speed">Velocità media</string>
+    <string name="avg_watts">Watt medi</string>
+    <string name="min_altitude">Altitudine minima</string>
+    <string name="max_altitude">Altitudine massima</string>
+    <string name="elevation_gain">Dislivello</string>
+
+    <!--  Misc strings  -->
+    <string name="time">Tempo</string>
+    <string name="speed">Velocità</string>
+    <string name="altitude">Altitudine</string>
+    <string name="distance">Distanza</string>
+
+
+
+
+
+
+</resources>

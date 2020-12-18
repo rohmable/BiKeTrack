@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name" translatable="false">BiKeTrack</string>
+
+    <!--  Data formats  -->
+    <string name="time_format" translatable="false">%1$02d:%2$02d:%3$02d</string>
+    <string name="speed_format" translatable="false">%1$.1f km/h</string>
+    <string name="altitude_format" translatable="false">%1$.1f m</string>
+    <string name="distance_format" translatable="false">%1$.1f km</string>
+    <string name="date_format" translatable="false">%1$s, %2$s</string>
+    <string name="length_format" translatable="false">%1$.1f h</string>
+    <string name="watts_format" translatable="false">%1$d W</string>
+
+    <!--  Default track names  -->
+    <string name="morning_track">Morning track</string>
+    <string name="afternoon_track">Afternoon track</string>
+    <string name="evening_track">Evening track</string>
+    <string name="night_track">Night track</string>
+
+    <!--  TracksListActivity strings  -->
+    <string name="track_open">Open</string>
+    <string name="track_delete">Delete</string>
+
+    <!--  RecordActivity strings  -->
+    <string name="record_track">Record track</string>
+    <string name="start_recording">Start recording</string>
+    <string name="stop_recording">Stop recording</string>
+    <string name="recording_started">Recording started</string>
+    <string name="recording_saved">Recording saved</string>
+
+    <!--  SettingsActivity strings  -->
+    <string name="settings">Settings</string>
+    <string name="your_info_header">Your Info</string>
+    <string name="height">Height</string>
+    <string name="weight">Weight</string>
+    <string name="data_gathering">Data gathering</string>
+    <string name="recording_resolution">Recording resolution (points per second)</string>
+
+    <!--  TrackDetailCard strings  -->
+    <string name="avg_speed">Average speed</string>
+    <string name="avg_watts">Average watts</string>
+    <string name="min_altitude">Minimum altitude</string>
+    <string name="max_altitude">Maximum altitude</string>
+    <string name="elevation_gain">Elevation gain</string>
+
+    <!--  Misc strings  -->
+    <string name="time">Time</string>
+    <string name="speed">Speed</string>
+    <string name="altitude">Altitude</string>
+    <string name="distance">Distance</string>
+</resources>
