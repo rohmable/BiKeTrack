@@ -32,8 +32,14 @@ class TrackDetailCard(context: Context, attrs: AttributeSet) :
     private fun updateTrack() {
         // Retrieve user info for watts calculation.
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val height = sharedPreferences.getInt("height", 180)
-        val weight = sharedPreferences.getInt("weight", 80)
+        val height = sharedPreferences.getInt(
+            context.getString(R.string.setting_height),
+            180
+        )
+        val weight = sharedPreferences.getInt(
+            context.getString(R.string.setting_weight),
+            80
+        )
 
         binding.txtDetailDistance.text = context.getString(
             R.string.distance_format,
@@ -66,6 +72,7 @@ class TrackDetailCard(context: Context, attrs: AttributeSet) :
     }
 
     companion object {
+        /** Log tag */
         private val TAG = TrackDetailCard::class.java.simpleName
     }
 }

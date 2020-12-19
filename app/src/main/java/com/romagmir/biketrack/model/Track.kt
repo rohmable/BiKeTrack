@@ -135,7 +135,6 @@ data class Track (
      *      * Distance
      *      * Date
      *      * Length
-     *      * Number of [positions][Position] memorized
      *
      * @param other The other object to compare.
      * @return True if the two objects are equal, false otherwise.
@@ -146,7 +145,6 @@ data class Track (
             && distance == other.distance
             && date == other.date
             && length == other.length
-            && positions.size == other.positions.size
 
     /**
      * Returns a hash code value for the object.

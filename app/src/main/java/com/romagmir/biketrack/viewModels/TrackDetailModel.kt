@@ -51,7 +51,7 @@ class TrackDetailModel(context: Application) : AndroidViewModel(context)  {
      */
     fun getDetails(track: Track) {
         // Remove previous event listeners
-        database.removeEventListener(trackDetailListener)
+//        database.removeEventListener(trackDetailListener)
         // Point the database reference to the selected track
         this.track.postValue(track)
         database = database.child(track.key)
@@ -64,13 +64,15 @@ class TrackDetailModel(context: Application) : AndroidViewModel(context)  {
      */
     private val trackDetailListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
+            val posArray = ArrayList<Position>()
             snapshot.children.forEach {
-                it.getValue<Position>()?.let { pos -> track.value?.positions?.add(pos) }
+                it.getValue<Position>()?.let { pos -> posArray.add(pos) }
+//                it.getValue<Position>()?.let { pos -> track.value?.positions?.add(pos) }
             }
+            track.value?.positions?.addAll(posArray)
             track.notifyObserver()
         }
 
-        override fun onCancelled(error: DatabaseError) {
-        }
+        override fun onCancelled(error: DatabaseError) { }
     }
 }

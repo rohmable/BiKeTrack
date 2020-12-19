@@ -34,6 +34,11 @@
     <string name="weight">Weight</string>
     <string name="data_gathering">Data gathering</string>
     <string name="recording_resolution">Recording resolution (points per second)</string>
+    <string name="keep_awake">Device awake during recording</string>
+    <string name="setting_height" translatable="false">height</string>
+    <string name="setting_weight" translatable="false">weight</string>
+    <string name="setting_resolution" translatable="false">recording_resolution</string>
+    <string name="setting_awake" translatable="false">keep_awake</string>
 
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Average speed</string>
@@ -41,6 +46,11 @@
     <string name="min_altitude">Minimum altitude</string>
     <string name="max_altitude">Maximum altitude</string>
     <string name="elevation_gain">Elevation gain</string>
+
+    <!--  RemoveTrackDialog strings  -->
+    <string name="dialog_text">Are you sure you want to delete this track?</string>
+    <string name="dialog_confirm">Yes</string>
+    <string name="dialog_deny">No</string>
 
     <!--  Misc strings  -->
     <string name="time">Time</string>

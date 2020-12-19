@@ -34,7 +34,10 @@ class RecordingModel(context: Application) : AndroidViewModel(context) {
 
     init {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val recordingResolution = sharedPreferences.getInt("recording_resolution", 6)
+        val recordingResolution = sharedPreferences.getInt(
+            context.getString(R.string.setting_resolution),
+            6
+        )
         trackRecorder.recordingResolution = recordingResolution
     }
 
@@ -115,6 +118,7 @@ class RecordingModel(context: Application) : AndroidViewModel(context) {
     }
 
     companion object {
+        /** Log tag */
         private val TAG = RecordingModel::class.java.simpleName
     }
 }

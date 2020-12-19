@@ -3,7 +3,7 @@
 
     <PreferenceCategory app:title="@string/your_info_header">
         <com.romagmir.biketrack.ui.NumberPickerPreference
-            app:key="height"
+            app:key="@string/setting_height"
             app:title="@string/height"
             app:min_value="1"
             app:max_value="300"
@@ -12,7 +12,7 @@
             app:useSimpleSummaryProvider="true"/>
 
         <com.romagmir.biketrack.ui.NumberPickerPreference
-            app:key="weight"
+            app:key="@string/setting_weight"
             app:title="@string/weight"
             app:min_value="1"
             app:max_value="400"
@@ -24,12 +24,17 @@
 
     <PreferenceCategory app:title="@string/data_gathering">
         <SeekBarPreference
-            app:key="recording_resolution"
+            app:key="@string/setting_resolution"
             android:max="10"
             app:min="1"
             app:defaultValue="6"
             app:title="@string/recording_resolution"
             app:showSeekBarValue="true" />
+
+        <SwitchPreference
+            app:key="@string/setting_awake"
+            app:title="@string/keep_awake"
+            app:defaultValue="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>

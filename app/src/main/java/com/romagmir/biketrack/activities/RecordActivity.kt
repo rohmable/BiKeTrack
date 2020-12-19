@@ -12,18 +12,22 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityRecordBinding
+import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.viewModels.RecordingModel
+import kotlin.reflect.KProperty
 
 /**
  * Used to record a [Track][com.romagmir.biketrack.model.Track]
  */
-class RecordActivity : AppCompatActivity() {
+class RecordActivity : FirebaseUserActivity() {
     /** Flag used to check if the location permission was granted by the user */
     private var locationPermissionGranted = false
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
@@ -48,28 +52,6 @@ class RecordActivity : AppCompatActivity() {
         // Enable the "back arrow" on the toolbar to go back to the previous activity
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        // If the user has previously authenticated the auth variable is not null and the user
-        // otherwise an authentication activity is started
-        val auth = FirebaseAuth.getInstance()
-        auth.currentUser?.let {
-            recordingModel.user = it
-        } ?: run {
-            val providers = arrayListOf(
-                AuthUI.IdpConfig.EmailBuilder().build(),
-                AuthUI.IdpConfig.GoogleBuilder().build()
-            )
-
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .setLogo(R.mipmap.ic_launcher_round)
-                    .setTheme(R.style.Theme_BiKeTrack)
-                    .build(),
-                RC_SIGN_IN
-            )
-        }
 
         // Setup activity default data
         binding.txtTime.text = getString(R.string.time_format, 0, 0, 0)
@@ -97,6 +79,27 @@ class RecordActivity : AppCompatActivity() {
         // Set correct icon on the FAB button
         val resource = if(recordingModel.running) R.drawable.ic_baseline_stop_24 else R.drawable.ic_baseline_play_arrow_24
         binding.fabRecord.setImageResource(resource)
+    }
+
+    /**
+     * Called when the user has changed.
+     *
+     * The value of the user has already been changed when this callback is invoked.
+     *
+     * @param property Property that called the method.
+     * @param oldValue Previous user.
+     * @param newValue New user.
+     */
+    override fun onUserChanged(
+        property: KProperty<*>,
+        oldValue: FirebaseUser?,
+        newValue: FirebaseUser?
+    ) {
+        super.onUserChanged(property, oldValue, newValue)
+
+        newValue?.let {
+            recordingModel.user = it
+        }
     }
 
     /**
@@ -128,6 +131,11 @@ class RecordActivity : AppCompatActivity() {
         }
 
         if(recordingModel.startRecording()) {
+            // Set recording preferences
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+            val deviceAwake = sharedPreferences.getBoolean(getString(R.string.setting_awake), true)
+            binding.recordRootLayout.keepScreenOn = deviceAwake
+            // UI adjustments
             src.setImageResource(R.drawable.ic_baseline_stop_24)
             src.contentDescription = getString(R.string.stop_recording)
             Toast.makeText(this, R.string.recording_started, Toast.LENGTH_SHORT).show()
@@ -143,6 +151,7 @@ class RecordActivity : AppCompatActivity() {
         Log.v(TAG, "Stop recording")
 
         recordingModel.stopRecording()
+        // UI adjustments
         src.setImageResource(R.drawable.ic_baseline_play_arrow_24)
         src.contentDescription = getString(R.string.start_recording)
         Toast.makeText(this, R.string.recording_saved, Toast.LENGTH_SHORT).show()
@@ -161,32 +170,6 @@ class RecordActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
             )
-        }
-    }
-
-    /**
-     * Called when a launched activity exits, returning the requestCode
-     * which it started with, the resultCode it returned, and any additional
-     * data from it.
-     *
-     * @param requestCode The integer request code originally supplied to
-     *                    startActivityForResult(), allowing to identify who this
-     *                    result came from.
-     * @param resultCode The integer result code returned by the child activity
-     *                   through its setResult().
-     * @param data An Intent, which can return result data to the caller
-     *               (various data can be attached to Intent "extras").
-     */
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        // Handling authentication results
-        if (requestCode == RC_SIGN_IN) {
-            val response = IdpResponse.fromResultIntent(data)
-            if (resultCode == Activity.RESULT_OK) {
-                recordingModel.user = FirebaseAuth.getInstance().currentUser
-            } else {
-                Log.d(TAG, "Log-in failed, cause: ${response?.error?.errorCode}")
-            }
         }
     }
 
@@ -212,7 +195,7 @@ class RecordActivity : AppCompatActivity() {
     }
 
     companion object {
-        /** Debugging tag */
+        /** Log tag */
         private val TAG = RecordActivity::class.java.simpleName
         /** Request code for login activity */
         private const val RC_SIGN_IN = 124

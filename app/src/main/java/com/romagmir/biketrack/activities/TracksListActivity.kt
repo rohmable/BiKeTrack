@@ -1,25 +1,24 @@
 package com.romagmir.biketrack.activities
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTracksListBinding
 import com.romagmir.biketrack.model.Track
+import com.romagmir.biketrack.ui.FirebaseUserActivity
+import com.romagmir.biketrack.ui.RemoveTrackDialog
 import com.romagmir.biketrack.ui.TracksAdapter
 import com.romagmir.biketrack.viewModels.TracksModel
+import kotlin.reflect.KProperty
 
 /**
  * Shows a list of [tracks][Track] saved by an user.
  */
-class TracksListActivity : AppCompatActivity() {
+class TracksListActivity : FirebaseUserActivity() {
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
     private lateinit var binding: ActivityTracksListBinding
     /** For showing each track inside a view */
@@ -37,29 +36,8 @@ class TracksListActivity : AppCompatActivity() {
             onDelete = {track -> adapterOnDelete(track)}
         )
         binding.trackList.adapter = trackAdapter
-
-        // If the user is already logged in the the data is retrieved, otherwise the app tries to
-        // log the user
-        val auth = FirebaseAuth.getInstance()
-        auth.currentUser?.let {
-            tracksModel.user = it
-            tracksModel.tracks.observe(this) {tracks ->
-                trackAdapter.tracks = tracks
-            }
-        } ?: run {
-            val providers = arrayListOf(
-                AuthUI.IdpConfig.EmailBuilder().build(),
-                AuthUI.IdpConfig.GoogleBuilder().build()
-            )
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .setLogo(R.mipmap.ic_launcher_round)
-                    .setTheme(R.style.Theme_BiKeTrack)
-                    .build(),
-                RC_SIGN_IN
-            )
+        tracksModel.tracks.observe(this) { tracks ->
+            trackAdapter.tracks = tracks
         }
 
         // Settings menu
@@ -73,20 +51,15 @@ class TracksListActivity : AppCompatActivity() {
         }
     }
 
+    override fun onUserChanged(
+        property: KProperty<*>,
+        oldValue: FirebaseUser?,
+        newValue: FirebaseUser?
+    ) {
+        super.onUserChanged(property, oldValue, newValue)
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SIGN_IN) {
-            // Handling login result
-            val response = IdpResponse.fromResultIntent(data)
-            if (resultCode == Activity.RESULT_OK) {
-                tracksModel.user = FirebaseAuth.getInstance().currentUser
-                tracksModel.tracks.observe(this) {tracks ->
-                    trackAdapter.tracks = tracks
-                }
-            } else {
-                Log.d(TAG, "Log-in failed, cause: ${response?.error?.errorCode}")
-            }
+        newValue.let {
+            tracksModel.user = it
         }
     }
 
@@ -95,6 +68,7 @@ class TracksListActivity : AppCompatActivity() {
      * is clicked.
      *
      * @param src Event source
+     *
      */
     fun addRecordingClicked(src: View) {
         val recordIntent = Intent(this, RecordActivity::class.java)
@@ -108,7 +82,7 @@ class TracksListActivity : AppCompatActivity() {
      */
     private fun adapterOnOpen(track: Track) {
         val openIntent = Intent(this, TrackDetailActivity::class.java)
-        openIntent.putExtra(TRACK, track)
+        openIntent.putExtra(TRACK_KEY, track)
         startActivity(openIntent)
         Log.d(TAG, "Opening $track")
     }
@@ -120,12 +94,16 @@ class TracksListActivity : AppCompatActivity() {
      */
     private fun adapterOnDelete(track: Track) {
         Log.d(TAG, "Deleting $track")
-        TODO("Implement track deletion")
+        val diag = RemoveTrackDialog(onConfirm = {tracksModel.removeTrack(track)})
+        diag.show(supportFragmentManager, CONFIRM_DIAG_TAG)
     }
 
     companion object {
+        /** Log tag */
         private val TAG = TracksListActivity::class.java.simpleName
-        private const val RC_SIGN_IN = 123
-        const val TRACK = "TRACK"
+        /** Key to retrieve the track contained in an intent */
+        const val TRACK_KEY = "TRACK"
+        /** Tag used to show the [RemoveTrackDialog] dialog */
+        private const val CONFIRM_DIAG_TAG = "CONFIRM_DIAG"
     }
 }

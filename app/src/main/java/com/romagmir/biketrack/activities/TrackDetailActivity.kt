@@ -1,14 +1,8 @@
 package com.romagmir.biketrack.activities
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -16,26 +10,26 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTrackDetailBinding
 import com.romagmir.biketrack.model.Position
 import com.romagmir.biketrack.model.Track
+import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.viewModels.TrackDetailModel
 import kotlin.math.ln
+import kotlin.reflect.KProperty
 
 /**
  * Shows the details of a [Track].
  */
-class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
+class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
     private lateinit var binding: ActivityTrackDetailBinding
     /** [ViewModel][androidx.lifecycle.ViewModel] used to store data during the whole app lifecycle */
     private val trackDetailModel: TrackDetailModel by viewModels()
     /** Map that is shown on the top of the activity */
     private lateinit var mMap: GoogleMap
-    /** [Track] that is shown */
-    private var track: Track? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,28 +41,23 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        track = intent.extras?.getParcelable(TracksListActivity.TRACK)
+        // Start retrieving the details of the given track (if any)
+        val track: Track? = intent.extras?.getParcelable(TracksListActivity.TRACK_KEY)
+        track?.let {
+            binding.toolbar.title = it.name
+            trackDetailModel.getDetails(it)
+        }
+    }
 
-        // If the user is already logged in then the data is retrieved via [updateTrackData]
-        // otherwise the app tries to log the user
-        val auth = FirebaseAuth.getInstance()
-        auth.currentUser?.let {currentUser ->
-            trackDetailModel.user = currentUser
-            updateTrackData()
-        } ?: run {
-            val providers = arrayListOf(
-                AuthUI.IdpConfig.EmailBuilder().build(),
-                AuthUI.IdpConfig.GoogleBuilder().build()
-            )
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .setLogo(R.mipmap.ic_launcher_round)
-                    .setTheme(R.style.Theme_BiKeTrack)
-                    .build(),
-                RC_SIGN_IN
-            )
+    override fun onUserChanged(
+        property: KProperty<*>,
+        oldValue: FirebaseUser?,
+        newValue: FirebaseUser?
+    ) {
+        super.onUserChanged(property, oldValue, newValue)
+
+        newValue?.let {
+            trackDetailModel.user = it
         }
     }
 
@@ -81,6 +70,7 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         trackDetailModel.track.observe(this) {
+            updateTrackData(it)
             drawLine(it)
         }
     }
@@ -90,14 +80,8 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
      *
      * The only view that is not updated is the map, this is made inside the [onMapReady] method.
      */
-    private fun updateTrackData() {
-        track?.let {
-            trackDetailModel.getDetails(it)
-            binding.toolbar.title = it.name
-            trackDetailModel.track.observe(this, { track ->
-                binding.detailCard.track = track
-            })
-        }
+    private fun updateTrackData(track: Track) {
+        binding.detailCard.track = track
     }
 
     /**
@@ -131,22 +115,8 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SIGN_IN) {
-            // Handling login result
-            val response = IdpResponse.fromResultIntent(data)
-            if (resultCode == Activity.RESULT_OK) {
-                trackDetailModel.user = FirebaseAuth.getInstance().currentUser
-                updateTrackData()
-            } else {
-                Log.d(TAG, "Log-in failed, cause: ${response?.error?.errorCode}")
-            }
-        }
-    }
-
     companion object {
+        /** Log tag */
         private val TAG = TrackDetailActivity::class.java.simpleName
-        private const val RC_SIGN_IN = 125
     }
 }

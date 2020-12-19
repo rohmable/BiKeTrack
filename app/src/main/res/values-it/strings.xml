@@ -35,6 +35,7 @@
     <string name="weight">Peso</string>
     <string name="data_gathering">Impostazioni di raccolta</string>
     <string name="recording_resolution">Risoluzione registrazione (punti al secondo)</string>
+    <string name="keep_awake">Schermo attivo durante la registrazione</string>
 
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Velocità media</string>
@@ -43,15 +44,14 @@
     <string name="max_altitude">Altitudine massima</string>
     <string name="elevation_gain">Dislivello</string>
 
+    <!--  RemoveTrackDialog strings  -->
+    <string name="dialog_text">Sei sicuro di voler rimuovere questo percorso?</string>
+    <string name="dialog_confirm">Sì</string>
+    <string name="dialog_deny">No</string>
+
     <!--  Misc strings  -->
     <string name="time">Tempo</string>
     <string name="speed">Velocità</string>
     <string name="altitude">Altitudine</string>
     <string name="distance">Distanza</string>
-
-
-
-
-
-
 </resources>
