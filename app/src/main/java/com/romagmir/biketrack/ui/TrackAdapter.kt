@@ -19,7 +19,7 @@ import com.romagmir.biketrack.model.Track
  * @property onOpen Lambda function that executes when the user presses the "Open" button.
  * @property onDelete Lambda function that executes when the user presses the "Delete" button.
  */
-class TracksAdapter(context: Context, trackList: List<Track> = ArrayList(), val onOpen: (Track) -> Unit, val onDelete: (Track) -> Unit) :
+class TracksAdapter(context: Context, trackList: List<Track> = ArrayList()) :
     ArrayAdapter<Track>(context, 0, trackList) {
     /** Localized date format used to show the date inside the views */
     private val dateFormat = DateFormat.getMediumDateFormat(context)
@@ -32,6 +32,8 @@ class TracksAdapter(context: Context, trackList: List<Track> = ArrayList(), val 
         clear()
         addAll(field)
     }
+    /** Listener for events */
+    var trackAdapterListener: TrackAdapterListener? = null
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         lateinit var binding: TrackRowItemBinding
@@ -55,9 +57,28 @@ class TracksAdapter(context: Context, trackList: List<Track> = ArrayList(), val 
         binding.txtRowName.text = track.name
         binding.txtRowDistance.text = context.getString(R.string.distance_format, track.distance / 1000)
         binding.txtRowLength.text = context.getString(R.string.length_format, track.length.toFloat()/(3600 * 1000))
-        binding.btnOpen.setOnClickListener { onOpen(track) }
-        binding.btnDelete.setOnClickListener { onDelete(track) }
+        binding.btnOpen.setOnClickListener { trackAdapterListener?.onOpen(track) }
+        binding.btnDelete.setOnClickListener { trackAdapterListener?.onDelete(track) }
         return binding.root
+    }
+
+    /**
+     * Listener interface to handle the various events triggered by the adapter.
+     */
+    interface TrackAdapterListener {
+        /**
+         * Handles the onDelete signal of the [TracksAdapter].
+         *
+         * @param track Track associated with the card shown.
+         */
+        fun onOpen(track: Track)
+
+        /**
+         * Handles the onDelete signal of the [TracksAdapter].
+         *
+         * @param track Track associated with the card shown.
+         */
+        fun onDelete(track: Track)
     }
 
 }

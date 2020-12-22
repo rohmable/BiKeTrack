@@ -31,10 +31,8 @@ class TracksListActivity : FirebaseUserActivity() {
         binding = ActivityTracksListBinding.inflate(layoutInflater)
         setContentView(binding.root)
         // Creating adapter
-        trackAdapter = TracksAdapter(this,
-            onOpen = { track -> adapterOnOpen(track)},
-            onDelete = {track -> adapterOnDelete(track)}
-        )
+        trackAdapter = TracksAdapter(this)
+        trackAdapter.trackAdapterListener = trackAdapterListener
         binding.trackList.adapter = trackAdapter
         tracksModel.tracks.observe(this) { tracks ->
             trackAdapter.tracks = tracks
@@ -75,27 +73,19 @@ class TracksListActivity : FirebaseUserActivity() {
         startActivity(recordIntent)
     }
 
-    /**
-     * Handles the onDelete signal of the [TracksAdapter].
-     *
-     * @param track Track associated with the card shown.
-     */
-    private fun adapterOnOpen(track: Track) {
-        val openIntent = Intent(this, TrackDetailActivity::class.java)
-        openIntent.putExtra(TRACK_KEY, track)
-        startActivity(openIntent)
-        Log.d(TAG, "Opening $track")
-    }
+    private val trackAdapterListener = object : TracksAdapter.TrackAdapterListener {
+        override fun onOpen(track: Track) {
+            val openIntent = Intent(this@TracksListActivity, TrackDetailActivity::class.java)
+            openIntent.putExtra(TRACK_KEY, track)
+            startActivity(openIntent)
+            Log.d(TAG, "Opening $track")
+        }
 
-    /**
-     * Handles the onDelete signal of the [TracksAdapter].
-     *
-     * @param track Track associated with the card shown.
-     */
-    private fun adapterOnDelete(track: Track) {
-        Log.d(TAG, "Deleting $track")
-        RemoveTrackDialog(onConfirm = {tracksModel.removeTrack(track)})
-            .show(supportFragmentManager, CONFIRM_DIAG_TAG)
+        override fun onDelete(track: Track) {
+            Log.d(TAG, "Deleting $track")
+            RemoveTrackDialog(onConfirm = {tracksModel.removeTrack(track)})
+                .show(supportFragmentManager, CONFIRM_DIAG_TAG)
+        }
     }
 
     companion object {
