@@ -9,12 +9,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.BiKeTrack">
+        android:theme="@style/Theme.BiKeTrack"
+        android:allowBackup="false">
         <activity android:name=".activities.TracksListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,7 +50,11 @@
                 android:value=".activities.TracksListActivity" />
         </activity>
 
-        <activity android:name=".activities.SettingsActivity" />
+        <activity android:name=".activities.SettingsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.TracksListActivity" />
+        </activity>
     </application>
 
 </manifest>

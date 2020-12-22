@@ -28,6 +28,10 @@
     <string name="recording_started">Registrazione iniziata</string>
     <string name="recording_saved">Registrazione salvata</string>
 
+    <!--  TrackDetailActivity strings  -->
+    <string name="detail_altitude">Altitudine: %1$.1f m</string>
+    <string name="detail_speed">Velocità: %1$.1f Km/h</string>
+
     <!--  SettingsActivity strings  -->
     <string name="settings">Impostazioni</string>
     <string name="your_info_header">Le tue informazioni</string>
@@ -43,6 +47,7 @@
     <string name="min_altitude">Altitudine minima</string>
     <string name="max_altitude">Altitudine massima</string>
     <string name="elevation_gain">Dislivello</string>
+    <string name="calories_burned">Calorie bruciate</string>
 
     <!--  RemoveTrackDialog strings  -->
     <string name="dialog_text">Sei sicuro di voler rimuovere questo percorso?</string>

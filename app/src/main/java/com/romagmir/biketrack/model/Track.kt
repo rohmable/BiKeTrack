@@ -21,26 +21,25 @@ data class Track (
     /** Track name chosen by the user. */
     var name: String = "",
     /** Track distance in meters. */
-    var distance: Float = 0f,
+    var distance: Double = 0.0,
     /** Track date. */
     var date: Date = Date(),
     /** Track length in milliseconds. */
     var length: Long = 0L,
+    /** Estimated power produced with the values of body mass and height given when the track was recorded */
+    var watts: Double = 0.0,
     /** Track readings. */
     var positions: ArrayList<Position> = ArrayList()
 ) : Parcelable {
     /** Average speed in Km/h. */
-    val avgSpeed: Float
-    get() = (distance / length.toFloat()) * 3600
-
+    val avgSpeed: Double
+    get() = (distance / length) * 3600
     /** Track minimum altitude in meters. */
     val minAltitude: Double
     get() = positions.minByOrNull { it.altitude }?.altitude ?: 0.0
-
     /** Track maximum altitude in meters. */
     val maxAltitude: Double
     get() = positions.maxByOrNull { it.altitude }?.altitude ?: 0.0
-
     /** Meters uphill during the track. */
     val elevationGain: Double
     get() = calcElevationGain()
@@ -87,7 +86,7 @@ data class Track (
         var gravity = 0.0
         var acceleration = 0.0
 
-        for ((start, end) in positions.zipWithNext()) {
+        positions.zipWithNext().forEach { (start, end) ->
             val speedAvg = (start.speed + end.speed) / 2
             var slope = (end.altitude - start.altitude) / (end.distance(start))
             slope = if (!slope.isNaN()) slope else 0.0
@@ -112,10 +111,14 @@ data class Track (
      * @param ref [DatabaseReference](https://firebase.google.com/docs/reference/android/com/google/firebase/database/DatabaseReference) to store the track.
      */
     fun write(ref: DatabaseReference) {
-        ref.child("name").setValue(name)
-        ref.child("distance").setValue(distance)
-        ref.child("date").setValue(date)
-        ref.child("length").setValue(length)
+        val values = mapOf(
+            "name" to name,
+            "distance" to distance,
+            "date" to date,
+            "length" to length,
+            "watts" to watts
+        )
+        ref.updateChildren(values)
     }
 
     /**

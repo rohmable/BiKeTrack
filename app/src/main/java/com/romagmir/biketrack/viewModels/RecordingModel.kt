@@ -70,22 +70,45 @@ class RecordingModel(context: Application) : AndroidViewModel(context) {
     fun stopRecording() {
         if (!running) return
         val track = trackRecorder.stop()
+        // Retrieve user info for watts calculation
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication())
+        val height = sharedPreferences.getInt(
+            getApplication<Application>().getString(R.string.setting_height),
+            180
+        ).toDouble()
+        val weight = sharedPreferences.getInt(
+            getApplication<Application>().getString(R.string.setting_weight),
+            80
+        ).toDouble()
+
         user?.let {
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     val tracksDb = FirebaseDatabase.getInstance().reference.child("tracks").child(it.uid)
                     val newVal = tracksDb.push()
+
+                    // Calculate watts
+                    track.watts = track.calcWatts(weight, height)
+
+                    // Write data to database
                     track.write(newVal)
                     newVal.key?.let {key ->
+                        // Write positions in a separate location
                         val positionsDb = FirebaseDatabase.getInstance().reference.child("positions").child(it.uid).child(key)
-                        track.positions.forEachIndexed { i, pos ->
-                            val newPos = positionsDb.child(i.toString())
-                            newPos.setValue(pos)
-                        }
+                        val positionsMap = track.positions.mapIndexed {idx, pos -> idx.toString() to pos}.toMap()
+                        positionsDb.updateChildren(positionsMap)
                     }
                 }
             }
         }
+    }
+
+    fun addTrackRecorderListener(recorder: TrackRecorder.TrackRecorderListener) {
+        trackRecorder.recorderListener = recorder
+    }
+
+    fun removeTrackRecorderListener() {
+        trackRecorder.recorderListener = null
     }
 
     /**

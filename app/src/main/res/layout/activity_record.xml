@@ -32,7 +32,7 @@
             tools:context=".activities.RecordActivity">
 
             <LinearLayout
-                android:id="@+id/linearLayout"
+                android:id="@+id/linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -44,14 +44,14 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/lblTime"
+                    android:id="@+id/lbl_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/time"
                     android:textSize="@dimen/record_title_size" />
 
                 <TextView
-                    android:id="@+id/txtTime"
+                    android:id="@+id/txt_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/time_format"
@@ -61,7 +61,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/linearLayout2"
+                android:id="@+id/linear_layout_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -70,7 +70,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+                app:layout_constraintTop_toBottomOf="@+id/linear_layout">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -79,14 +79,14 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/lblSpeed"
+                        android:id="@+id/lbl_speed"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/speed"
                         android:textSize="@dimen/record_title_size" />
 
                     <TextView
-                        android:id="@+id/txtSpeed"
+                        android:id="@+id/txt_speed"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/speed_format"
@@ -101,14 +101,14 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/lblAltitude"
+                        android:id="@+id/lbl_altitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/altitude"
                         android:textSize="@dimen/record_title_size" />
 
                     <TextView
-                        android:id="@+id/txtAltitude"
+                        android:id="@+id/txt_altitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/altitude_format"
@@ -126,7 +126,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+                app:layout_constraintTop_toBottomOf="@+id/linear_layout_2">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -135,14 +135,14 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/lblDistance"
+                        android:id="@+id/lbl_distance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/distance"
                         android:textSize="@dimen/record_title_size" />
 
                     <TextView
-                        android:id="@+id/txtDistance"
+                        android:id="@+id/txt_distance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/distance_format"
@@ -160,14 +160,32 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabRecord"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/start_recording"
-        android:onClick="onRecordClick"
-        android:src="@drawable/ic_baseline_play_arrow_24" />
+        android:layout_gravity="bottom|right"
+        app:layout_anchorGravity="bottom|right|end">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            android:indeterminateTint="@color/secondary_text_color" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:contentDescription="@string/start_recording"
+            android:onClick="onRecordClick"/>
+<!--            android:src="@drawable/ic_baseline_play_arrow_24" />-->
+    </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

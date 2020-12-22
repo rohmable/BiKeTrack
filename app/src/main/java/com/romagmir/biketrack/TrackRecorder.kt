@@ -2,6 +2,8 @@ package com.romagmir.biketrack
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
+import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.location.LocationCallback
@@ -32,23 +34,18 @@ class TrackRecorder(context: Context, var recordingResolution: Int = 1) {
     var running = false
     /** Contains the recorded [Track] */
     private var actualTrack = Track()
-    /** Contains the last position returned by the [locationClient] */
-    private var lastKnownPosition: Position? = null
-
+    /** Contains the last location returned by the [locationClient] */
+    private var lastKnownLocation: Location? = null
+    /** Handler used to keep track of the route time */
+    private val timerHandler = Handler(Looper.getMainLooper())
     /** Stores the most recent position tracked by the recorder */
-    val position: MutableLiveData<Position> by lazy {
-        MutableLiveData<Position>()
-    }
-
+    val position: MutableLiveData<Position> by lazy { MutableLiveData<Position>() }
     /** Stores the total distance of the track */
-    val distance: MutableLiveData<Float> by lazy {
-        MutableLiveData<Float>(0f)
-    }
-
+    val distance: MutableLiveData<Double> by lazy { MutableLiveData<Double>(0.0) }
     /** Stores the total recording time of the track */
-    val recordingTime: MutableLiveData<Long> by lazy {
-        MutableLiveData<Long>(0)
-    }
+    val recordingTime: MutableLiveData<Long> by lazy { MutableLiveData<Long>(0) }
+
+    var recorderListener: TrackRecorderListener? = null
 
     init {
         // Setting up the quality of service parameters
@@ -68,14 +65,16 @@ class TrackRecorder(context: Context, var recordingResolution: Int = 1) {
         if (running) return false
         // Resetting previous data
         position.postValue(Position())
-        distance.postValue(0f)
+        distance.postValue(0.0)
         recordingTime.postValue(0L)
-        lastKnownPosition = null
+        lastKnownLocation = null
 
         // Create new track and bind the locationCallback to the locationClient
         actualTrack = Track(name=trackName)
         locationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        timerHandler.postDelayed(timerRunnable, TIMER_PERIOD)
         running = true
+        recorderListener?.onRecordingStart()
         return true
     }
 
@@ -87,48 +86,92 @@ class TrackRecorder(context: Context, var recordingResolution: Int = 1) {
     fun stop() : Track {
         if (running) {
             locationClient.removeLocationUpdates(locationCallback)
+            timerHandler.removeCallbacks(timerRunnable)
             running = false
+            recorderListener?.onRecordingEnd()
         }
         return actualTrack
     }
 
+    /**
+     * Increments the track length by a definite amount of time in milliseconds.
+     */
+    private val timerRunnable = object : Runnable {
+        override fun run() {
+            if (lastKnownLocation != null) {
+                actualTrack.length += TIMER_PERIOD
+                recordingTime.postValue(actualTrack.length)
+            }
+            timerHandler.postDelayed(this, TIMER_PERIOD)
+        }
+    }
 
     /**
      * Callback used to gather the location data.
      */
-    private var locationCallback = object : LocationCallback() {
+    private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             if (!running) return
             // Location data can come in batches
-            for (location in locationResult.locations) {
+            locationResult.locations.asSequence().filter { it.accuracy <= 20 }.forEach { location ->
+                val speed = location.speed.toDouble() * 3.6
+
                 // Create new position from the updated location
                 val newPosition = Position(
+                    timestamp=location.time,
                     latitude=location.latitude,
                     longitude=location.longitude,
-                    timestamp=location.time,
                     altitude=location.altitude,
-                    speed=location.speed
+                    speed=speed
                 )
 
                 // Compute data based on the previous location (if exists)
-                var newDistance = 0f
-                var timePassed = 0L
-                lastKnownPosition?.let {
-                    newDistance = it.distance(newPosition)
-                    timePassed = newPosition.timestamp - it.timestamp
+                val newDistance = lastKnownLocation?.let {
+                    location.distanceTo(it).toDouble()
+                } ?: run {
+                    recorderListener?.onDataReceived()
+                    0.0
                 }
 
                 // Update the recorded track
                 actualTrack.positions.add(newPosition)
                 actualTrack.distance += newDistance
-                actualTrack.length += timePassed
-                lastKnownPosition = newPosition
+                newPosition.distance = actualTrack.distance
+                lastKnownLocation = location
 
                 // Publish track properties changes
                 position.postValue(newPosition)
                 distance.postValue(actualTrack.distance)
-                recordingTime.postValue(actualTrack.length)
             }
         }
+    }
+
+    interface TrackRecorderListener {
+        /**
+         * Called when the recording has started.
+         *
+         * This does not imply that any data has been received from the [locationClient]
+         */
+        fun onRecordingStart()
+
+        /**
+         * Called when the recording has ended.
+         *
+         * This means that no new data will be added to the actual track.
+         */
+        fun onRecordingEnd()
+
+        /**
+         * Called when the recorder receives the first location data.
+         *
+         * From now on the track will be updated with new data.
+         */
+        fun onDataReceived()
+    }
+
+    /** @suppress */
+    companion object {
+        /** Timer period in milliseconds */
+        private const val TIMER_PERIOD = 250L
     }
 }

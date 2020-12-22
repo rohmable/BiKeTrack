@@ -3,12 +3,13 @@
 
     <!--  Data formats  -->
     <string name="time_format" translatable="false">%1$02d:%2$02d:%3$02d</string>
-    <string name="speed_format" translatable="false">%1$.1f km/h</string>
+    <string name="speed_format" translatable="false">%1$.1f Km/h</string>
     <string name="altitude_format" translatable="false">%1$.1f m</string>
-    <string name="distance_format" translatable="false">%1$.1f km</string>
+    <string name="distance_format" translatable="false">%1$.1f Km</string>
     <string name="date_format" translatable="false">%1$s, %2$s</string>
     <string name="length_format" translatable="false">%1$.1f h</string>
     <string name="watts_format" translatable="false">%1$d W</string>
+    <string name="kcal_format" translatable="false">%1$d Kcal</string>
 
     <!--  Default track names  -->
     <string name="morning_track">Morning track</string>
@@ -26,6 +27,10 @@
     <string name="stop_recording">Stop recording</string>
     <string name="recording_started">Recording started</string>
     <string name="recording_saved">Recording saved</string>
+
+    <!--  TrackDetailActivity strings  -->
+    <string name="detail_altitude">Altitude: %1$.1f m</string>
+    <string name="detail_speed">Speed: %1$.1f Km/h</string>
 
     <!--  SettingsActivity strings  -->
     <string name="settings">Settings</string>
@@ -46,6 +51,7 @@
     <string name="min_altitude">Minimum altitude</string>
     <string name="max_altitude">Maximum altitude</string>
     <string name="elevation_gain">Elevation gain</string>
+    <string name="calories_burned">Calories burned</string>
 
     <!--  RemoveTrackDialog strings  -->
     <string name="dialog_text">Are you sure you want to delete this track?</string>

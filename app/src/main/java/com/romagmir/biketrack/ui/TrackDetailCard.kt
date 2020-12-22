@@ -30,24 +30,14 @@ class TrackDetailCard(context: Context, attrs: AttributeSet) :
      * Updates the children views with the [track] data.
      */
     private fun updateTrack() {
-        // Retrieve user info for watts calculation.
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val height = sharedPreferences.getInt(
-            context.getString(R.string.setting_height),
-            180
-        )
-        val weight = sharedPreferences.getInt(
-            context.getString(R.string.setting_weight),
-            80
-        )
-
+        val hoursLength = track.length.toFloat() / (3600 * 1000)
         binding.txtDetailDistance.text = context.getString(
             R.string.distance_format,
             track.distance / 1000
         )
         binding.txtDetailTime.text = context.getString(
             R.string.length_format,
-            track.length.toFloat() / (3600 * 1000)
+            hoursLength
         )
         binding.txtMinAltitude.text = context.getString(
             R.string.altitude_format,
@@ -62,13 +52,11 @@ class TrackDetailCard(context: Context, attrs: AttributeSet) :
             R.string.speed_format,
             track.avgSpeed
         )
-
-        val watts = track.calcWatts(weight.toDouble(), height.toDouble())
         binding.txtDetailAvgWatts.text = context.getString(
             R.string.watts_format,
-            watts.roundToInt()
+            track.watts.toInt()
         )
-        Log.d(TAG, "Track key is ${track.key}")
+        binding.txtDetailCaloriesBurned.text = context.getString(R.string.kcal_format, (track.watts * hoursLength * 3.6).roundToInt())
     }
 
     companion object {

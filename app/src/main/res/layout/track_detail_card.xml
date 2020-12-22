@@ -2,7 +2,7 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardView"
+    android:id="@+id/card_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -16,7 +16,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/lblDetailDistance"
+                android:id="@+id/lbl_detail_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -24,7 +24,7 @@
                 android:textSize="@dimen/detail_text_size" />
 
             <TextView
-                android:id="@+id/txtDetailDistance"
+                android:id="@+id/txt_detail_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -37,7 +37,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/lblDetailTime"
+                android:id="@+id/lbl_detail_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -45,7 +45,7 @@
                 android:textSize="@dimen/detail_text_size" />
 
             <TextView
-                android:id="@+id/txtDetailTime"
+                android:id="@+id/txt_detail_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -58,7 +58,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/lblMinAltitude"
+                android:id="@+id/lbl_min_altitude"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -66,7 +66,7 @@
                 android:textSize="@dimen/detail_text_size" />
 
             <TextView
-                android:id="@+id/txtMinAltitude"
+                android:id="@+id/txt_min_altitude"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -79,7 +79,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/lblMaxAltitude"
+                android:id="@+id/lbl_max_altitude"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -87,7 +87,7 @@
                 android:textSize="@dimen/detail_text_size" />
 
             <TextView
-                android:id="@+id/txtMaxAltitude"
+                android:id="@+id/txt_max_altitude"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -100,7 +100,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/lblElevationGain"
+                android:id="@+id/lbl_elevation_gain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -108,7 +108,7 @@
                 android:textSize="@dimen/detail_text_size" />
 
             <TextView
-                android:id="@+id/txtElevationGain"
+                android:id="@+id/txt_elevation_gain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -121,7 +121,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/lblDetailAvgSpeed"
+                android:id="@+id/lbl_detail_avg_speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -129,7 +129,7 @@
                 android:textSize="@dimen/detail_text_size" />
 
             <TextView
-                android:id="@+id/txtDetailAvgSpeed"
+                android:id="@+id/txt_detail_avg_speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -142,7 +142,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/lblDetailAvgWatts"
+                android:id="@+id/lbl_detail_avg_watts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -150,12 +150,33 @@
                 android:textSize="@dimen/detail_text_size" />
 
             <TextView
-                android:id="@+id/txtDetailAvgWatts"
+                android:id="@+id/txt_detail_avg_watts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="@dimen/detail_text_size"
                 tools:text="100 W" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/lbl_detail_calories_burned"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/calories_burned"
+                android:textSize="@dimen/detail_text_size" />
+
+            <TextView
+                android:id="@+id/txt_detail_calories_burned"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="@dimen/detail_text_size"
+                tools:text="100 Kcal" />
         </TableRow>
     </TableLayout>
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
@@ -45,7 +46,10 @@ class TracksModel(context: Application) : AndroidViewModel(context) {
     init {
         // The Firebase database persistence option must be enabled before any usage of the database
         // functionalities, for this reason the [database] reference is assigned in the default constructor
-        Firebase.database.setPersistenceEnabled(true)
+        // after checking if this is the first time that we enable the persistence
+        if (FirebaseApp.getApps(getApplication()).isEmpty()) {
+            Firebase.database.setPersistenceEnabled(true)
+        }
         database = FirebaseDatabase.getInstance().reference.child("tracks")
     }
 
@@ -80,12 +84,10 @@ class TracksModel(context: Application) : AndroidViewModel(context) {
     private val trackListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             Log.d(TAG, "New track list loaded")
-            val newTracks = ArrayList<Track>()
-            snapshot.children.forEach {
-                it.getValue<Track>()?.let { track ->
-                    track.key = it.key ?: ""
-                    newTracks.add(track)
-                }
+            val newTracks = snapshot.children.mapNotNull {
+                val track = it.getValue<Track>()
+                track?.key = it.key ?: ""
+                track
             }
             tracks.clear()
             tracks.addAll(newTracks)

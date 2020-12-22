@@ -64,12 +64,8 @@ class TrackDetailModel(context: Application) : AndroidViewModel(context)  {
      */
     private val trackDetailListener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            val posArray = ArrayList<Position>()
-            snapshot.children.forEach {
-                it.getValue<Position>()?.let { pos -> posArray.add(pos) }
-//                it.getValue<Position>()?.let { pos -> track.value?.positions?.add(pos) }
-            }
-            track.value?.positions?.addAll(posArray)
+            val posList = snapshot.children.mapNotNull { it.getValue<Position>() }
+            track.value?.positions?.addAll(posList)
             track.notifyObserver()
         }
 

@@ -31,14 +31,14 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/txtRowDate"
+                        android:id="@+id/txt_row_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/track_date_size"
                         tools:text="Dec 2, 2020, 05:17 PM" />
 
                     <TextView
-                        android:id="@+id/txtRowName"
+                        android:id="@+id/txt_row_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/track_name_size"
@@ -58,14 +58,14 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/lblRowDistance"
+                            android:id="@+id/lbl_row_distance"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/distance"
                             android:textSize="@dimen/track_detail_size" />
 
                         <TextView
-                            android:id="@+id/txtRowDistance"
+                            android:id="@+id/txt_row_distance"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/track_distance_size"
@@ -78,14 +78,14 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/lblRowLength"
+                            android:id="@+id/lbl_row_length"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/time"
                             android:textSize="@dimen/track_detail_size" />
 
                         <TextView
-                            android:id="@+id/txtRowLength"
+                            android:id="@+id/txt_row_length"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/track_distance_size"
@@ -103,23 +103,23 @@
 
                 <Button
                     style="?android:attr/buttonBarButtonStyle"
-                    android:id="@+id/btnDelete"
+                    android:id="@+id/btn_delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="8dp"
-                    android:background="@color/buttonColor"
+                    android:background="@color/button_color"
                     android:text="@string/track_delete"
-                    android:textColor="@color/deleteColor" />
+                    android:textColor="@color/delete_color" />
 
                 <Button
                     style="?android:attr/buttonBarButtonStyle"
-                    android:id="@+id/btnOpen"
+                    android:id="@+id/btn_open"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="8dp"
-                    android:background="@color/buttonColor"
+                    android:background="@color/button_color"
                     android:text="@string/track_open"
-                    android:textColor="@color/openColor" />
+                    android:textColor="@color/open_color" />
             </LinearLayout>
         </LinearLayout>
 

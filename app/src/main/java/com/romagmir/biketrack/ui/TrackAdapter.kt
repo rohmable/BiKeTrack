@@ -54,7 +54,7 @@ class TracksAdapter(context: Context, trackList: List<Track> = ArrayList(), val 
         )
         binding.txtRowName.text = track.name
         binding.txtRowDistance.text = context.getString(R.string.distance_format, track.distance / 1000)
-        binding.txtRowLength.text = context.getString(R.string.length_format, (track.length/(3600 * 1000)).toFloat())
+        binding.txtRowLength.text = context.getString(R.string.length_format, track.length.toFloat()/(3600 * 1000))
         binding.btnOpen.setOnClickListener { onOpen(track) }
         binding.btnDelete.setOnClickListener { onDelete(track) }
         return binding.root

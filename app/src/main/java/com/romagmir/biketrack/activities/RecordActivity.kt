@@ -19,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
+import com.romagmir.biketrack.TrackRecorder
 import com.romagmir.biketrack.databinding.ActivityRecordBinding
 import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.viewModels.RecordingModel
@@ -81,6 +82,16 @@ class RecordActivity : FirebaseUserActivity() {
         binding.fabRecord.setImageResource(resource)
     }
 
+    override fun onResume() {
+        super.onResume()
+        recordingModel.addTrackRecorderListener(recorderListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        recordingModel.removeTrackRecorderListener()
+    }
+
     /**
      * Called when the user has changed.
      *
@@ -111,8 +122,8 @@ class RecordActivity : FirebaseUserActivity() {
      */
     fun onRecordClick(src: View) {
         // Relay call to specific handler
-        if (recordingModel.running) stopTrack(src as FloatingActionButton)
-        else startTrack(src as FloatingActionButton)
+        if (recordingModel.running) stopTrack()
+        else startTrack()
     }
 
     /**
@@ -123,23 +134,13 @@ class RecordActivity : FirebaseUserActivity() {
      *
      * @param src FAB that generated the event
      */
-    private fun startTrack(src: FloatingActionButton) {
+    private fun startTrack() {
         Log.v(TAG, "Start recording")
 
         if (!locationPermissionGranted) {
             getLocationPermission()
         }
-
-        if(recordingModel.startRecording()) {
-            // Set recording preferences
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-            val deviceAwake = sharedPreferences.getBoolean(getString(R.string.setting_awake), true)
-            binding.recordRootLayout.keepScreenOn = deviceAwake
-            // UI adjustments
-            src.setImageResource(R.drawable.ic_baseline_stop_24)
-            src.contentDescription = getString(R.string.stop_recording)
-            Toast.makeText(this, R.string.recording_started, Toast.LENGTH_SHORT).show()
-        }
+        recordingModel.startRecording()
     }
 
     /**
@@ -147,14 +148,53 @@ class RecordActivity : FirebaseUserActivity() {
      *
      * @param src FAB that generated the event
      */
-    private fun stopTrack(src: FloatingActionButton) {
+    private fun stopTrack() {
         Log.v(TAG, "Stop recording")
-
         recordingModel.stopRecording()
-        // UI adjustments
-        src.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-        src.contentDescription = getString(R.string.start_recording)
-        Toast.makeText(this, R.string.recording_saved, Toast.LENGTH_SHORT).show()
+    }
+
+    private val recorderListener = object : TrackRecorder.TrackRecorderListener {
+        /**
+         * Called when the recording has started.
+         *
+         * This does not imply that any data has been received from the [locationClient]
+         */
+        override fun onRecordingStart() {
+            // Set recording preferences
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@RecordActivity)
+            val deviceAwake = sharedPreferences.getBoolean(getString(R.string.setting_awake), true)
+            binding.recordRootLayout.keepScreenOn = deviceAwake
+            // Show progress bar
+            binding.progressBar.visibility = View.VISIBLE
+        }
+
+        /**
+         * Called when the recording has ended.
+         *
+         * This means that no new data will be added to the actual track.
+         */
+        override fun onRecordingEnd() {
+            // UI adjustments
+            binding.recordRootLayout.keepScreenOn = false
+            binding.fabRecord.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+            binding.fabRecord.contentDescription = getString(R.string.start_recording)
+            Toast.makeText(this@RecordActivity, R.string.recording_saved, Toast.LENGTH_SHORT).show()
+        }
+
+        /**
+         * Called when the recorder receives the first location data.
+         *
+         * From now on the track will be updated with new data.
+         */
+        override fun onDataReceived() {
+            // Hide progress bar
+            binding.progressBar.visibility = View.INVISIBLE
+            // UI adjustments
+            binding.fabRecord.setImageResource(R.drawable.ic_baseline_stop_24)
+            binding.fabRecord.contentDescription = getString(R.string.stop_recording)
+            Toast.makeText(this@RecordActivity, R.string.recording_started, Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     /**

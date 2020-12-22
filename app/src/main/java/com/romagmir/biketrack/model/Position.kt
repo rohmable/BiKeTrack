@@ -2,6 +2,7 @@ package com.romagmir.biketrack.model
 
 import android.location.Location
 import android.os.Parcelable
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -12,15 +13,17 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Position (
         /** Instant in time in milliseconds. */
-        val timestamp: Long = 0,
+        var timestamp: Long = 0,
+        /** Distance in meters of the position inside a route */
+        var distance: Double = 0.0,
         /** Latitude coordinate. */
-        val latitude: Double = 0.0,
+        var latitude: Double = 0.0,
         /** Longitude coordinate. */
-        val longitude: Double = 0.0,
+        var longitude: Double = 0.0,
         /** Altitude in meters. */
-        val altitude: Double = 0.0,
+        var altitude: Double = 0.0,
         /** Speed in Km/h */
-        val speed: Float = 0f
+        var speed: Double = 0.0
 ) : Parcelable {
     /**
      * Calculates the distance in meters from this position to the one given as parameter.
@@ -28,9 +31,12 @@ data class Position (
      * @param to Position to calculate the distance to.
      * @return The distance from the given position in meters.
      */
-    fun distance(to: Position): Float {
-        return distance(this, to)
-    }
+    fun distance(to: Position): Double = distance(this, to)
+
+    /**
+     * Returns the position as a [LatLng] object with his latitude and longitude.
+     */
+    fun toLatLng() = LatLng(latitude, longitude)
 
     /** @suppress */
     companion object {
@@ -41,7 +47,7 @@ data class Position (
          * @param to Arrival position.
          * @return Distance between the two positions in meters.
          */
-        fun distance(from: Position, to: Position): Float {
+        fun distance(from: Position, to: Position): Double {
             val results = FloatArray(1)
             Location.distanceBetween(
                     from.latitude,
@@ -49,7 +55,7 @@ data class Position (
                     to.latitude,
                     to.longitude,
                     results)
-            return results[0]
+            return results[0].toDouble()
         }
     }
 }

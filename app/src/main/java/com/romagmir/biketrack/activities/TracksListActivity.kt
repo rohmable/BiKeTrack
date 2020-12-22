@@ -94,8 +94,8 @@ class TracksListActivity : FirebaseUserActivity() {
      */
     private fun adapterOnDelete(track: Track) {
         Log.d(TAG, "Deleting $track")
-        val diag = RemoveTrackDialog(onConfirm = {tracksModel.removeTrack(track)})
-        diag.show(supportFragmentManager, CONFIRM_DIAG_TAG)
+        RemoveTrackDialog(onConfirm = {tracksModel.removeTrack(track)})
+            .show(supportFragmentManager, CONFIRM_DIAG_TAG)
     }
 
     companion object {
