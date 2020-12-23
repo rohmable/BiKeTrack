@@ -110,8 +110,12 @@ class RecordActivity : FirebaseUserActivity() {
         super.onUserChanged(property, oldValue, newValue)
 
         newValue?.let {
-            recordingModel = ViewModelProviders.of(this, RecordingModel.RecordingModelFactory(application, it))
-                .get(RecordingModel::class.java)
+            if (this::recordingModel.isInitialized) {
+                recordingModel.user = it
+            } else {
+                recordingModel = ViewModelProviders.of(this, RecordingModel.RecordingModelFactory(application, it))
+                    .get(RecordingModel::class.java)
+            }
         }
     }
 

@@ -18,7 +18,7 @@ import java.time.ZonedDateTime
  *
  * @property user Used to memorize the track recordings.
  */
-class RecordingModel(context: Application, val user: FirebaseUser) : AndroidViewModel(context) {
+class RecordingModel(context: Application, var user: FirebaseUser) : AndroidViewModel(context) {
     /** Used to record the tracks. */
     private val trackRecorder = TrackRecorder(getApplication<Application>().applicationContext)
     /** @see TrackRecorder.position */
