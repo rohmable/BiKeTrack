@@ -108,9 +108,8 @@ class TracksModel(context: Application, user: FirebaseUser) : AndroidViewModel(c
         </T> */
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(TracksModel::class.java)) {
-                val ret = TracksModel(app, user)
                 @Suppress("UNCHECKED_CAST")
-                return ret as T
+                return TracksModel(app, user) as T
             }
             throw IllegalArgumentException("Unable to construct viewModel")
         }

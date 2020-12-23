@@ -146,6 +146,9 @@ class TrackRecorder(context: Context, var recordingResolution: Int = 1) {
         }
     }
 
+    /**
+     * Listener interface to handle the various events triggered by the recorder.
+     */
     interface TrackRecorderListener {
         /**
          * Called when the recording has started.
