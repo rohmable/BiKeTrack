@@ -3,6 +3,8 @@ package com.romagmir.biketrack.viewModels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
@@ -18,24 +20,12 @@ import com.romagmir.biketrack.utils.notifyObserver
  * A [Track] record maintains just an overview of the data, the details relative to his route are kept
  * separate.
  * When an activity needs the details of the track these are gathered by this [ViewModel][androidx.lifecycle.ViewModel]
+ *
+ * @property user  Used to access the track details, must match the user that recorded the track
  */
-class TrackDetailModel(context: Application) : AndroidViewModel(context)  {
+class TrackDetailModel(context: Application, val user: FirebaseUser) : AndroidViewModel(context)  {
     /** Database reference */
-    private var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("positions")
-    /** Database user used to access the track details, must match the user that recorded the track */
-    var user: FirebaseUser? = null
-    set(value) {
-        // Remove old event listeners in case of subsequent calls
-        database.removeEventListener(trackDetailListener)
-        field = value
-        field?.let {
-            // Sets the database reference on the new user
-            database = FirebaseDatabase.getInstance().reference.child("positions").child(it.uid)
-        } ?: run {
-            database = FirebaseDatabase.getInstance().reference.child("positions")
-        }
-    }
-
+    private var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("positions").child(user.uid)
     /** Stores the track selected with [getDetails] */
     val track: MutableLiveData<Track> by lazy {
         MutableLiveData<Track>()
@@ -50,8 +40,6 @@ class TrackDetailModel(context: Application) : AndroidViewModel(context)  {
      * @param track Track to retrieve the details from
      */
     fun getDetails(track: Track) {
-        // Remove previous event listeners
-//        database.removeEventListener(trackDetailListener)
         // Point the database reference to the selected track
         this.track.postValue(track)
         database = database.child(track.key)
@@ -70,5 +58,29 @@ class TrackDetailModel(context: Application) : AndroidViewModel(context)  {
         }
 
         override fun onCancelled(error: DatabaseError) { }
+    }
+
+    /**
+     * Factory pattern used to instantiate a TrackDetailModel ViewModel
+     *
+     * @property app Context
+     * @property user User that wants to connect to the database
+     */
+    class TrackDetailModelFactory(val app: Application, private val user: FirebaseUser) : ViewModelProvider.Factory {
+        /**
+         * Creates a new instance of the TrackDetailModel.
+         *
+         * @param modelClass a `Class` whose instance is requested
+         * @param <T>        The type parameter for the ViewModel.
+         * @return a newly created TracksModel
+        </T> */
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(TrackDetailModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return TrackDetailModel(app, user) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewModel")
+        }
+
     }
 }

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.SeekBar
 import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -32,7 +33,7 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
     private lateinit var binding: ActivityTrackDetailBinding
     /** [ViewModel][androidx.lifecycle.ViewModel] used to store data during the whole app lifecycle */
-    private val trackDetailModel: TrackDetailModel by viewModels()
+    private lateinit var trackDetailModel: TrackDetailModel
     /** Map that is shown on the top of the activity */
     private lateinit var mMap: GoogleMap
     /** Displayed track */
@@ -110,7 +111,8 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
         super.onUserChanged(property, oldValue, newValue)
 
         newValue?.let {
-            trackDetailModel.user = it
+            trackDetailModel = ViewModelProviders.of(this, TrackDetailModel.TrackDetailModelFactory(application, it))
+                .get(TrackDetailModel::class.java)
         }
     }
 
