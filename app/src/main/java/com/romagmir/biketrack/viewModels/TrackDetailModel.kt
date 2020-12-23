@@ -21,11 +21,17 @@ import com.romagmir.biketrack.utils.notifyObserver
  * separate.
  * When an activity needs the details of the track these are gathered by this [ViewModel][androidx.lifecycle.ViewModel]
  *
- * @property user  Used to access the track details, must match the user that recorded the track
  */
-class TrackDetailModel(context: Application, val user: FirebaseUser) : AndroidViewModel(context)  {
+class TrackDetailModel(context: Application, user: FirebaseUser) : AndroidViewModel(context)  {
     /** Database reference */
     private var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("positions").child(user.uid)
+    /** Used to access the track details, must match the user that recorded the track */
+    var user: FirebaseUser = user
+    set(value) {
+        field = value
+        database.removeEventListener(trackDetailListener)
+        database = FirebaseDatabase.getInstance().reference.child("positions").child(value.uid)
+    }
     /** Stores the track selected with [getDetails] */
     val track: MutableLiveData<Track> by lazy {
         MutableLiveData<Track>()

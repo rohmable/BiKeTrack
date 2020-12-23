@@ -111,8 +111,12 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
         super.onUserChanged(property, oldValue, newValue)
 
         newValue?.let {
-            trackDetailModel = ViewModelProviders.of(this, TrackDetailModel.TrackDetailModelFactory(application, it))
-                .get(TrackDetailModel::class.java)
+            if (this::trackDetailModel.isInitialized) {
+                trackDetailModel.user = it
+            } else {
+                trackDetailModel = ViewModelProviders.of(this, TrackDetailModel.TrackDetailModelFactory(application, it))
+                    .get(TrackDetailModel::class.java)
+            }
         }
     }
 
