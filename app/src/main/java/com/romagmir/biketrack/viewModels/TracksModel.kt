@@ -19,23 +19,16 @@ import com.romagmir.biketrack.utils.clear
 
 /**
  * Handles the saved track list for a given user.
+ *
  */
-class TracksModel(context: Application) : AndroidViewModel(context) {
+class TracksModel(context: Application, user: FirebaseUser) : AndroidViewModel(context) {
     /** Database reference */
-    private var database: DatabaseReference
+    private var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("tracks").child(user.uid)
     /** Database user used to access the track list */
-    var user: FirebaseUser? = null
+    var user: FirebaseUser = user
     set(value) {
-        // Remove old event listeners in case of subsequent calls
-        database.removeEventListener(trackListener)
         field = value
-        field?.let {
-            // Set the database reference to the new user and start to listen for the values
-            database = FirebaseDatabase.getInstance().reference.child("tracks").child(it.uid)
-            database.addValueEventListener(trackListener)
-        }?: run {
-            database = FirebaseDatabase.getInstance().reference.child("tracks")
-        }
+        database = FirebaseDatabase.getInstance().reference.child("tracks").child(user.uid)
     }
 
     /** Stores the users track list */
@@ -50,7 +43,6 @@ class TracksModel(context: Application) : AndroidViewModel(context) {
         if (FirebaseApp.getApps(getApplication()).isEmpty()) {
             Firebase.database.setPersistenceEnabled(true)
         }
-        database = FirebaseDatabase.getInstance().reference.child("tracks")
     }
 
     /**
@@ -66,9 +58,9 @@ class TracksModel(context: Application) : AndroidViewModel(context) {
      */
     fun removeTrack(track: Track) {
         tracks.value?.let {
-            if (user != null && it.contains(track)) {
+            if (it.contains(track)) {
                 val trackRef = database.child(track.key)
-                val posRef = FirebaseDatabase.getInstance().reference.child("positions").child(user!!.uid).child(track.key)
+                val posRef = FirebaseDatabase.getInstance().reference.child("positions").child(user.uid).child(track.key)
                 Log.d(TAG, "Removing track: $track")
                 trackRef.removeValue()
                 posRef.removeValue()
@@ -82,6 +74,10 @@ class TracksModel(context: Application) : AndroidViewModel(context) {
      *  Database listener, reads the tracks for the given user.
      */
     private val trackListener = object : ValueEventListener {
+        init {
+            database.addValueEventListener(this)
+        }
+
         override fun onDataChange(snapshot: DataSnapshot) {
             Log.d(TAG, "New track list loaded")
             val newTracks = snapshot.children.mapNotNull {
@@ -94,6 +90,31 @@ class TracksModel(context: Application) : AndroidViewModel(context) {
         }
 
         override fun onCancelled(error: DatabaseError) { }
+    }
+
+    /**
+     * Factory pattern used to instantiate a TracksModel ViewModel
+     *
+     * @property app Context
+     * @property user User that wants to connect to the database
+     */
+    class TracksModelFactory(val app: Application, private val user: FirebaseUser) : ViewModelProvider.Factory {
+        /**
+         * Creates a new instance of the TracksModel.
+         *
+         * @param modelClass a `Class` whose instance is requested
+         * @param <T>        The type parameter for the ViewModel.
+         * @return a newly created TracksModel
+        </T> */
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(TracksModel::class.java)) {
+                val ret = TracksModel(app, user)
+                @Suppress("UNCHECKED_CAST")
+                return ret as T
+            }
+            throw IllegalArgumentException("Unable to construct viewModel")
+        }
+
     }
 
     companion object {

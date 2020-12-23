@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProviders
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTracksListBinding
@@ -24,7 +26,7 @@ class TracksListActivity : FirebaseUserActivity() {
     /** For showing each track inside a view */
     private lateinit var trackAdapter: TracksAdapter
     /** [ViewModel][androidx.lifecycle.ViewModel] used to store data during the whole app lifecycle */
-    private val tracksModel: TracksModel by viewModels()
+    private lateinit var tracksModel: TracksModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +58,13 @@ class TracksListActivity : FirebaseUserActivity() {
     ) {
         super.onUserChanged(property, oldValue, newValue)
 
-        newValue.let {
-            tracksModel.user = it
+        newValue?.let {
+            if (this::tracksModel.isInitialized) {
+                tracksModel.user = it
+            } else {
+                tracksModel = ViewModelProviders.of(this, TracksModel.TracksModelFactory(application, it))
+                    .get(TracksModel::class.java)
+            }
         }
     }
 
