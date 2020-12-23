@@ -9,8 +9,6 @@
     <color name="primary_text_color">#ffffff</color>
     <color name="secondary_text_color">#ffffff</color>
 
-    <color name="delete_color">#D50000</color>
-    <color name="open_color">#304FFE</color>
     <color name="button_color">#00FFFFFF</color>
     <color name="light_blue_400">#FF29B6F6</color>
     <color name="light_blue_600">#FF039BE5</color>
