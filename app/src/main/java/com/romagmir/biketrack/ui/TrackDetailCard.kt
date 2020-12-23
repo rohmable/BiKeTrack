@@ -30,14 +30,13 @@ class TrackDetailCard(context: Context, attrs: AttributeSet) :
      * Updates the children views with the [track] data.
      */
     private fun updateTrack() {
-        val hoursLength = track.length.toFloat() / (3600 * 1000)
         binding.txtDetailDistance.text = context.getString(
             R.string.distance_format,
             track.distance / 1000
         )
         binding.txtDetailTime.text = context.getString(
             R.string.length_format,
-            hoursLength
+            track.hoursLength
         )
         binding.txtMinAltitude.text = context.getString(
             R.string.altitude_format,
@@ -56,7 +55,7 @@ class TrackDetailCard(context: Context, attrs: AttributeSet) :
             R.string.watts_format,
             track.watts.toInt()
         )
-        binding.txtDetailCaloriesBurned.text = context.getString(R.string.kcal_format, (track.watts * hoursLength * 3.6).roundToInt())
+        binding.txtDetailCaloriesBurned.text = context.getString(R.string.kcal_format, track.calories)
     }
 
     companion object {

@@ -7,6 +7,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.atan
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 /**
@@ -43,6 +44,12 @@ data class Track (
     /** Meters uphill during the track. */
     val elevationGain: Double
     get() = calcElevationGain()
+    /** Track length in hours */
+    val hoursLength
+    get() = length.toDouble() / (3600 * 1000)
+    /** Calories burned on the track, estimated from the average watts */
+    val calories
+    get() = (watts * hoursLength * 3.6).roundToInt()
 
     /**
      *  Calculates the meters of the track spent uphill
