@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -34,7 +35,7 @@ class RecordActivity : FirebaseUserActivity() {
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
     private lateinit var binding: ActivityRecordBinding
     /** Recording [ViewModel][androidx.lifecycle.ViewModel] used to store data during the whole app lifecycle */
-    private val recordingModel: RecordingModel by viewModels()
+    private lateinit var recordingModel: RecordingModel
 
     /**
      * Perform initialization of all fragments.
@@ -109,7 +110,8 @@ class RecordActivity : FirebaseUserActivity() {
         super.onUserChanged(property, oldValue, newValue)
 
         newValue?.let {
-            recordingModel.user = it
+            recordingModel = ViewModelProviders.of(this, RecordingModel.RecordingModelFactory(application, it))
+                .get(RecordingModel::class.java)
         }
     }
 

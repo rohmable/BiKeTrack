@@ -2,8 +2,7 @@ package com.romagmir.biketrack.viewModels
 
 import android.annotation.SuppressLint
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
@@ -16,12 +15,12 @@ import java.time.ZonedDateTime
 
 /**
  * Handles the recording and the database writing of the tracks.
+ *
+ * @property user Used to memorize the track recordings.
  */
-class RecordingModel(context: Application) : AndroidViewModel(context) {
+class RecordingModel(context: Application, val user: FirebaseUser) : AndroidViewModel(context) {
     /** Used to record the tracks. */
     private val trackRecorder = TrackRecorder(getApplication<Application>().applicationContext)
-    /** Used to memorize the track recordings. */
-    var user: FirebaseUser? = null
     /** @see TrackRecorder.position */
     val position = trackRecorder.position
     /** @see TrackRecorder.distance */
@@ -138,6 +137,30 @@ class RecordingModel(context: Application) : AndroidViewModel(context) {
                 return ""
             }
         }
+    }
+
+    /**
+     * Factory pattern used to instantiate a RecordingModel ViewModel
+     *
+     * @property app Context
+     * @property user User that wants to connect to the database
+     */
+    class RecordingModelFactory(val app: Application, private val user: FirebaseUser) : ViewModelProvider.Factory {
+        /**
+         * Creates a new instance of the RecordingModel.
+         *
+         * @param modelClass a `Class` whose instance is requested
+         * @param <T>        The type parameter for the ViewModel.
+         * @return a newly created TracksModel
+        </T> */
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(RecordingModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return RecordingModel(app, user) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewModel")
+        }
+
     }
 
     companion object {
