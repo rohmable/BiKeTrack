@@ -59,4 +59,5 @@
     <string name="speed">Velocità</string>
     <string name="altitude">Altitudine</string>
     <string name="distance">Distanza</string>
+    <string name="logout">Logout</string>
 </resources>

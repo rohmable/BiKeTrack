@@ -10,6 +10,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.ktx.Firebase
 import com.romagmir.biketrack.R
 import java.util.*
 import kotlin.properties.Delegates
@@ -36,7 +37,11 @@ open class FirebaseUserActivity : AppCompatActivity() {
      * @param newValue New user.
      */
     open fun onUserChanged(property: KProperty<*>, oldValue: FirebaseUser?, newValue: FirebaseUser?) {
-        Log.d(TAG, "User \"${newValue?.displayName}\" logged in")
+        newValue?.let {
+            Log.d(TAG, "User \"${it.displayName}\" logged in (uid: ${it.uid})")
+        } ?: run {
+            logUser()
+        }
     }
 
     /**
@@ -48,19 +53,33 @@ open class FirebaseUserActivity : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        logUser(force = true)
+    }
+
+    /**
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are *not* resumed.
+     */
+    override fun onResume() {
+        super.onResume()
         logUser()
     }
 
     /**
      * If the user is already logged then the [user] observable is immediately assigned, otherwise
      * an [AuthUI] activity is started.
+     *
+     * @param force Force the update of the user, calling the [onUserChanged] method.
      */
-    private fun logUser() {
+    private fun logUser(force: Boolean = false) {
         // If the user is already logged in the the data is retrieved, otherwise the app tries to
         // log the user
         val auth = FirebaseAuth.getInstance()
         auth.currentUser?.let {
-            user = it
+            if (user != it || force) {
+                user = it
+            }
         } ?: run {
             startActivityForResult(
                 AuthUI.getInstance()
@@ -72,6 +91,14 @@ open class FirebaseUserActivity : AppCompatActivity() {
                 RC_SIGN_IN
             )
         }
+    }
+
+    /**
+     * Logs out the user and tries to log in again.
+     */
+    fun logOut() {
+        FirebaseAuth.getInstance().signOut()
+        logUser()
     }
 
     /**
@@ -96,7 +123,6 @@ open class FirebaseUserActivity : AppCompatActivity() {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == Activity.RESULT_OK) {
                 user = FirebaseAuth.getInstance().currentUser
-
             } else {
                 Log.d(TAG, "Log-in failed, cause ${response?.error?.errorCode}")
             }

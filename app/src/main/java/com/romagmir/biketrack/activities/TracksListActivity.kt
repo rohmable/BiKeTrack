@@ -3,11 +3,14 @@ package com.romagmir.biketrack.activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import android.widget.Toolbar
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.ktx.Firebase
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTracksListBinding
 import com.romagmir.biketrack.model.Track
@@ -36,19 +39,10 @@ class TracksListActivity : FirebaseUserActivity() {
         trackAdapter = TracksAdapter(this)
         trackAdapter.trackAdapterListener = trackAdapterListener
         binding.trackList.adapter = trackAdapter
-        tracksModel.tracks.observe(this) { tracks ->
-            trackAdapter.tracks = tracks
-        }
 
         // Settings menu
         binding.toolbar.inflateMenu(R.menu.main_menu)
-        binding.toolbar.setOnMenuItemClickListener {
-            if (it.itemId == R.id.settings) {
-                val settingsIntent = Intent(this, SettingsActivity::class.java)
-                startActivity(settingsIntent)
-            }
-            false
-        }
+        binding.toolbar.setOnMenuItemClickListener(menuItemListener)
     }
 
     override fun onUserChanged(
@@ -64,6 +58,11 @@ class TracksListActivity : FirebaseUserActivity() {
             } else {
                 tracksModel = ViewModelProviders.of(this, TracksModel.TracksModelFactory(application, it))
                     .get(TracksModel::class.java)
+
+                Log.d(TAG, "TracksModel created, now observing tracks")
+                tracksModel.tracks.observe(this) { tracks ->
+                    trackAdapter.tracks = tracks
+                }
             }
         }
     }
@@ -84,8 +83,8 @@ class TracksListActivity : FirebaseUserActivity() {
         override fun onOpen(track: Track) {
             val openIntent = Intent(this@TracksListActivity, TrackDetailActivity::class.java)
             openIntent.putExtra(TRACK_KEY, track)
-            startActivity(openIntent)
             Log.d(TAG, "Opening $track")
+            startActivity(openIntent)
         }
 
         override fun onDelete(track: Track) {
@@ -93,6 +92,21 @@ class TracksListActivity : FirebaseUserActivity() {
             RemoveTrackDialog(onConfirm = {tracksModel.removeTrack(track)})
                 .show(supportFragmentManager, CONFIRM_DIAG_TAG)
         }
+    }
+
+    private val menuItemListener = androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {
+        when(it.itemId) {
+            R.id.settings -> {
+                val settingsIntent = Intent(this, SettingsActivity::class.java)
+                startActivity(settingsIntent)
+            }
+            R.id.logout -> {
+                Log.d(TAG, "Logging out")
+                tracksModel.tracks.postValue(arrayListOf())
+                logOut()
+            }
+        }
+        false
     }
 
     companion object {

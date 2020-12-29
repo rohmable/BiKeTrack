@@ -28,7 +28,10 @@ class TracksModel(context: Application, user: FirebaseUser) : AndroidViewModel(c
     var user: FirebaseUser = user
     set(value) {
         field = value
+        Log.d(TAG, "Now observing user: ${user.displayName}")
+        database.removeEventListener(trackListener)
         database = FirebaseDatabase.getInstance().reference.child("tracks").child(user.uid)
+        database.addValueEventListener(trackListener)
     }
 
     /** Stores the users track list */
