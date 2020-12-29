@@ -2,8 +2,8 @@ package com.romagmir.biketrack.activities
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.SeekBar
-import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -23,7 +23,6 @@ import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.viewModels.TrackDetailModel
 import kotlin.math.ln
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.reflect.KProperty
 
 /**
@@ -69,11 +68,8 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
 
         // Start retrieving the details of the given track (if any)
         track = intent.extras?.getParcelable(TracksListActivity.TRACK_KEY) ?: Track()
-
-        track.let {
-            binding.toolbar.title = it.name
-            trackDetailModel.getDetails(it)
-        }
+        binding.toolbar.title = track.name
+        trackDetailModel.getDetails(track)
 
         // Setup the various graph views
         binding.detailGraph.gridLabelRenderer.labelFormatter = graphLabelFormatter
@@ -140,6 +136,7 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
      * The only view that is not updated is the map, this is made inside the [onMapReady] method.
      */
     private fun updateTrackData(track: Track) {
+        Log.d(TAG, "Drawing track graphs")
         this.track = track
 
         binding.detailCard.track = track
@@ -173,6 +170,7 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
      *  @param track The route that must be drawn on the map.
      */
     private fun drawLine(track: Track) {
+        Log.d(TAG, "Drawing track route on map")
         track.positions.let { positions ->
             if (positions.isEmpty()) return
             // Draw polyline using the coordinates included in the track in pairs

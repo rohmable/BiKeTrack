@@ -5,16 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.ktx.Firebase
 import com.romagmir.biketrack.R
-import java.util.*
 import kotlin.properties.Delegates
-import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 
 /**

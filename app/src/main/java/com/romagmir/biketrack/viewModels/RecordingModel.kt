@@ -2,7 +2,10 @@ package com.romagmir.biketrack.viewModels
 
 import android.annotation.SuppressLint
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
@@ -80,23 +83,21 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
             80
         ).toDouble()
 
-        user?.let {
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    val tracksDb = FirebaseDatabase.getInstance().reference.child("tracks").child(it.uid)
-                    val newVal = tracksDb.push()
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val tracksDb = FirebaseDatabase.getInstance().reference.child("tracks").child(user.uid)
+                val newVal = tracksDb.push()
 
-                    // Calculate watts
-                    track.watts = track.calcWatts(weight, height)
+                // Calculate watts
+                track.watts = track.calcWatts(weight, height)
 
-                    // Write data to database
-                    track.write(newVal)
-                    newVal.key?.let {key ->
-                        // Write positions in a separate location
-                        val positionsDb = FirebaseDatabase.getInstance().reference.child("positions").child(it.uid).child(key)
-                        val positionsMap = track.positions.mapIndexed {idx, pos -> idx.toString() to pos}.toMap()
-                        positionsDb.updateChildren(positionsMap)
-                    }
+                // Write data to database
+                track.write(newVal)
+                newVal.key?.let {key ->
+                    // Write positions in a separate location
+                    val positionsDb = FirebaseDatabase.getInstance().reference.child("positions").child(user.uid).child(key)
+                    val positionsMap = track.positions.mapIndexed {idx, pos -> idx.toString() to pos}.toMap()
+                    positionsDb.updateChildren(positionsMap)
                 }
             }
         }

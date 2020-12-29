@@ -2,13 +2,10 @@ package com.romagmir.biketrack.ui
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import androidx.cardview.widget.CardView
-import androidx.preference.PreferenceManager
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.TrackDetailCardBinding
 import com.romagmir.biketrack.model.Track
-import kotlin.math.roundToInt
 
 /**
  * Shows data for a given track on a [CardView].

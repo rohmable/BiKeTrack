@@ -3,14 +3,9 @@ package com.romagmir.biketrack.activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
-import android.widget.Toolbar
-import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProviders
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.ktx.Firebase
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTracksListBinding
 import com.romagmir.biketrack.model.Track

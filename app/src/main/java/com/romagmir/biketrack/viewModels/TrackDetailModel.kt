@@ -1,6 +1,7 @@
 package com.romagmir.biketrack.viewModels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,6 +47,7 @@ class TrackDetailModel(context: Application, user: FirebaseUser) : AndroidViewMo
      * @param track Track to retrieve the details from
      */
     fun getDetails(track: Track) {
+        Log.d(TAG, "Retrieving data for track key \"${track.key}\"")
         // Point the database reference to the selected track
         this.track.postValue(track)
         database = database.child(track.key)
@@ -87,6 +89,9 @@ class TrackDetailModel(context: Application, user: FirebaseUser) : AndroidViewMo
             }
             throw IllegalArgumentException("Unable to construct viewModel")
         }
+    }
 
+    companion object {
+        private val TAG = TrackDetailModel::class.java.simpleName
     }
 }
