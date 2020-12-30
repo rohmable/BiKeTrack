@@ -10,6 +10,7 @@
     <string name="length_format" translatable="false">%1$.1f h</string>
     <string name="watts_format" translatable="false">%1$d W</string>
     <string name="kcal_format" translatable="false">%1$d Kcal</string>
+    <string name="graph_format" translatable="false">%1$.1f</string>
 
     <!--  Default track names  -->
     <string name="morning_track">Morning track</string>
@@ -27,6 +28,8 @@
     <string name="stop_recording">Stop recording</string>
     <string name="recording_started">Recording started</string>
     <string name="recording_saved">Recording saved</string>
+    <string name="graph_altitude">Altitude (m)</string>
+    <string name="graph_speed">Speed (Km/h)</string>
 
     <!--  TrackDetailActivity strings  -->
     <string name="detail_altitude">Altitude: %1$.1f m</string>

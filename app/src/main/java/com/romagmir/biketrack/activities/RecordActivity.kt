@@ -11,11 +11,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseUser
+import com.jjoe64.graphview.DefaultLabelFormatter
+import com.jjoe64.graphview.series.DataPoint
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.TrackRecorder
 import com.romagmir.biketrack.databinding.ActivityRecordBinding
 import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.viewModels.RecordingModel
+import kotlin.math.max
 import kotlin.reflect.KProperty
 
 /**
@@ -58,6 +61,11 @@ class RecordActivity : FirebaseUserActivity() {
         recordingModel.position.observe(this) { position ->
             binding.txtSpeed.text = getString(R.string.speed_format, position.speed)
             binding.txtAltitude.text = getString(R.string.altitude_format, position.altitude)
+            recordingModel.altitudeSeries.appendData(DataPoint(position.distance, position.altitude), false, MAX_DATA_POINTS, false)
+            recordingModel.speedSeries.appendData(DataPoint(position.distance, position.speed), false, MAX_DATA_POINTS, false)
+            binding.recordGraph.viewport.setMaxY(max(recordingModel.altitudeSeries.highestValueY, 1000.0))
+            binding.recordGraph.secondScale.setMaxY(max(recordingModel.speedSeries.highestValueY, 50.0))
+            binding.recordGraph.viewport.setMaxX(position.distance)
         }
         recordingModel.distance.observe(this) { distance ->
             binding.txtDistance.text = getString(R.string.distance_format, distance / 1000)
@@ -70,9 +78,27 @@ class RecordActivity : FirebaseUserActivity() {
             binding.txtTime.text = getString(R.string.time_format, hours, minutes, seconds)
         }
 
+        with(binding.recordGraph) {
+            gridLabelRenderer.labelFormatter = graphLabelFormatter
+            secondScale.labelFormatter = graphLabelFormatter
+            addSeries(recordingModel.altitudeSeries)
+            secondScale.addSeries(recordingModel.speedSeries)
+
+            viewport.isScalable = true
+            viewport.isXAxisBoundsManual = true
+            viewport.isYAxisBoundsManual = true
+            viewport.setMinX(0.0)
+            secondScale.setMinY(0.0)
+        }
+
         // Set correct icon on the FAB button
         val resource = if(recordingModel.running) R.drawable.ic_baseline_stop_24 else R.drawable.ic_baseline_play_arrow_24
         binding.fabRecord.setImageResource(resource)
+
+        if (recordingModel.running) {
+            binding.recordGraph.visibility = View.VISIBLE
+            binding.lytLegend.visibility = View.VISIBLE
+        }
     }
 
     override fun onResume() {
@@ -130,7 +156,6 @@ class RecordActivity : FirebaseUserActivity() {
      * Checks if the location permission is granted before trying to start the recording, this is
      * the only check that is made.
      *
-     * @param src FAB that generated the event
      */
     private fun startTrack() {
         Log.v(TAG, "Start recording")
@@ -144,7 +169,6 @@ class RecordActivity : FirebaseUserActivity() {
     /**
      * Handles the stop of a new recording and updates the UI accordingly.
      *
-     * @param src FAB that generated the event
      */
     private fun stopTrack() {
         Log.v(TAG, "Stop recording")
@@ -188,11 +212,26 @@ class RecordActivity : FirebaseUserActivity() {
             // Hide progress bar
             binding.progressBar.visibility = View.INVISIBLE
             // UI adjustments
+            binding.recordGraph.visibility = View.VISIBLE
+            binding.lytLegend.visibility = View.VISIBLE
             binding.fabRecord.setImageResource(R.drawable.ic_baseline_stop_24)
             binding.fabRecord.contentDescription = getString(R.string.stop_recording)
             Toast.makeText(this@RecordActivity, R.string.recording_started, Toast.LENGTH_SHORT).show()
         }
 
+    }
+
+    /**
+     * Formatter used for the primary axis by the graph view.
+     */
+    private val graphLabelFormatter = object : DefaultLabelFormatter() {
+        override fun formatLabel(value: Double, isValueX: Boolean): String {
+            return if (isValueX) {
+                ""
+            } else {
+                getString(R.string.graph_format, value)
+            }
+        }
     }
 
     /**
@@ -239,5 +278,7 @@ class RecordActivity : FirebaseUserActivity() {
         private const val RC_SIGN_IN = 124
         /** Request code for location permissions */
         private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+        /** Maximum number of data points visible on the graph */
+        private const val MAX_DATA_POINTS = 10000
     }
 }

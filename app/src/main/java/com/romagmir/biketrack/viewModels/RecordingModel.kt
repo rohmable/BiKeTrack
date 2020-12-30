@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
+import com.jjoe64.graphview.series.DataPoint
+import com.jjoe64.graphview.series.LineGraphSeries
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.TrackRecorder
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +35,10 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
     /** @see TrackRecorder.running */
     val running
     get() = trackRecorder.running
+    /** Shows the altitude variation on a graph */
+    val altitudeSeries = LineGraphSeries<DataPoint>()
+    /** Shows the speed variation on a graph */
+    val speedSeries = LineGraphSeries<DataPoint>()
 
     init {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -41,6 +47,19 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
             6
         )
         trackRecorder.recordingResolution = recordingResolution
+
+        // Setting up graph series
+        with(altitudeSeries) {
+            isDrawBackground = true
+            color = context.getColor(R.color.altitude_color)
+            backgroundColor = context.getColor(R.color.altitude_background_color)
+            title = context.getString(R.string.altitude)
+        }
+
+        with(speedSeries) {
+            color = context.getColor(R.color.speed_color)
+            title = context.getString(R.string.speed)
+        }
     }
 
     override fun onCleared() {
@@ -61,6 +80,8 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
     fun startRecording(): Boolean {
         if (running) return false
         trackRecorder.start(genTrackName())
+        altitudeSeries.resetData(arrayOf())
+        speedSeries.resetData(arrayOf())
         return true
     }
 

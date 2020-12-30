@@ -27,6 +27,8 @@
     <string name="stop_recording">Termina registrazione</string>
     <string name="recording_started">Registrazione iniziata</string>
     <string name="recording_saved">Registrazione salvata</string>
+    <string name="graph_altitude">Altitudine (m)</string>
+    <string name="graph_speed">Velocità (Km/h)</string>
 
     <!--  TrackDetailActivity strings  -->
     <string name="detail_altitude">Altitudine: %1$.1f m</string>
