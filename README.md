@@ -4,7 +4,7 @@
 
 BiKeTrack is and android app made for an university project on mobile programming.
 
-The app allows the user to track his bicycle rides using the smartphone GPS and later check the gathered data and some usefule statistics for a bicycle rider such as:
+The app allows the user to track his bicycle rides using the smartphone GPS and later check the gathered data and some useful statistics for a bicycle rider such as:
 - Ride length and duration
 - Average speed
 - Minimum altitude
