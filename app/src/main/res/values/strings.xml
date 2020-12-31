@@ -40,11 +40,18 @@
     <string name="your_info_header">Your Info</string>
     <string name="height">Height</string>
     <string name="weight">Weight</string>
+    <string name="weekly_objectives">Your weekly objectives</string>
+    <string name="weekly_enable">Enable weekly objectives</string>
+    <string name="weekly_calories">Calories burned</string>
+    <string name="weekly_hours">Hours of training</string>
     <string name="data_gathering">Data gathering</string>
     <string name="recording_resolution">Recording resolution (points per second)</string>
     <string name="keep_awake">Device awake during recording</string>
     <string name="setting_height" translatable="false">height</string>
     <string name="setting_weight" translatable="false">weight</string>
+    <string name="setting_enable_weekly" translatable="false">weekly_enable</string>
+    <string name="setting_weekly_calories" translatable="false">weekly_calories</string>
+    <string name="setting_weekly_hours" translatable="false">weekly_hours</string>
     <string name="setting_resolution" translatable="false">recording_resolution</string>
     <string name="setting_awake" translatable="false">keep_awake</string>
 

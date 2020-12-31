@@ -2,12 +2,11 @@ package com.romagmir.biketrack.activities
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.preference.*
 import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.ui.FirebaseUserActivity
-import com.romagmir.biketrack.ui.NumberPickerPreference
-import com.romagmir.biketrack.ui.NumberPickerPreferenceDialog
 import com.romagmir.biketrack.utils.PreferencesSynchronizer
 import kotlin.reflect.KProperty
 
@@ -91,21 +90,6 @@ class SettingsActivity : FirebaseUserActivity() {
             sharedPrefs.unregisterOnSharedPreferenceChangeListener(prefChangeListener)
         }
 
-        override fun onDisplayPreferenceDialog(preference: Preference?) {
-            if (parentFragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) {
-                return
-            }
-
-            if (preference is NumberPickerPreference) {
-                // Display [NumberPickerPreferenceDialog]
-                val dialog = NumberPickerPreferenceDialog.newInstance(preference.key)
-                dialog.setTargetFragment(this, 0)
-                dialog.show(parentFragmentManager, DIALOG_FRAGMENT_TAG)
-            } else {
-                super.onDisplayPreferenceDialog(preference)
-            }
-        }
-
         /**
          * Listens to preference value changes and keeps the UI updated with new data
          */
@@ -134,6 +118,8 @@ class SettingsActivity : FirebaseUserActivity() {
             ) {
                 if (sharedPreferences == null || key == null) return
 
+                Log.d(TAG, "Shared preferences changed, reloading")
+
                 val pref = this@SettingsFragment.findPreference<Preference>(key)
                 pref?.let {
                     when (it) {
@@ -141,6 +127,8 @@ class SettingsActivity : FirebaseUserActivity() {
                             it.value = sharedPreferences.getInt(key, 0)
                         is SwitchPreference ->
                             it.isChecked = sharedPreferences.getBoolean(key, false)
+                        is EditTextPreference ->
+                            it.text = sharedPreferences.getString(key, "")
                         else -> {
                             it.summary = sharedPreferences.all[key].toString()
                         }
@@ -148,10 +136,9 @@ class SettingsActivity : FirebaseUserActivity() {
                 }
             }
         }
+    }
 
-        companion object {
-            /** Dialog used by the [NumberPickerPreferenceDialog][com.romagmir.biketrack.ui.NumberPickerPreferenceDialog] fragment */
-            private const val DIALOG_FRAGMENT_TAG = "NumberPickerDialog"
-        }
+    companion object {
+        private val TAG = SettingsActivity::class.java.simpleName
     }
 }

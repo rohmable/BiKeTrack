@@ -16,9 +16,15 @@ import kotlinx.coroutines.withContext
  */
 class PreferencesSynchronizer(val context: Context, user: FirebaseUser, private var preferences: SharedPreferences) {
     /** Database reference */
-    private var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("settings").child(user.uid)
+    private var database = FirebaseDatabase.getInstance().reference.child("settings").child(user.uid)
+    /** Database reference containing the default settings values */
+    private val defaultReference = FirebaseDatabase.getInstance().reference.child("settings").child("default_settings")
     /** User that must be synchronized */
     var user: FirebaseUser = user
+    set(value) {
+        field = value
+        database = FirebaseDatabase.getInstance().reference.child("settings").child(field.uid)
+    }
 
     /**
      * Write data to the database.
@@ -52,8 +58,12 @@ class PreferencesSynchronizer(val context: Context, user: FirebaseUser, private 
          * @param snapshot The current data at the location
          */
         override fun onDataChange(snapshot: DataSnapshot) {
-            Log.d(TAG, "Received settings data, now reading")
-            preferences.read(snapshot)
+            Log.d(TAG, "Received settings data: $snapshot")
+            snapshot.value?.let {
+                preferences.read(snapshot)
+            } ?: run {
+                defaultReference.addListenerForSingleValueEvent(this)
+            }
         }
 
         /**
@@ -91,9 +101,11 @@ class PreferencesSynchronizer(val context: Context, user: FirebaseUser, private 
      */
     private fun SharedPreferences.read(data: DataSnapshot) {
         with(edit()) {
+            clear()
             all.forEach { (key, pref) ->
                 if (data.hasChild(key)) {
                     val value = data.child(key)
+                    Log.d(TAG, "Reading $key setting, value is $value")
                     when(pref) {
                         is String -> putString(key, value.getValue<String>() ?: "")
                         is Int -> putInt(key, value.getValue<Int>() ?: 0)
@@ -103,7 +115,7 @@ class PreferencesSynchronizer(val context: Context, user: FirebaseUser, private 
                     }
                 }
             }
-            apply()
+            commit()
         }
         Log.d(TAG, "Settings data read")
     }

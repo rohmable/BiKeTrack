@@ -2,24 +2,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="@string/your_info_header">
-        <com.romagmir.biketrack.ui.NumberPickerPreference
-            app:key="@string/setting_height"
-            app:title="@string/height"
-            app:min_value="1"
-            app:max_value="300"
+        <com.romagmir.biketrack.ui.RangeEditNumberPreference
+            android:key="@string/setting_height"
+            android:title="@string/height"
+            android:dialogLayout="@layout/preference_edit_text"
+            android:defaultValue="180"
+            android:min="1"
+            android:max="300"
             app:suffix="cm"
-            app:initial_value="180"
             app:useSimpleSummaryProvider="true"/>
 
-        <com.romagmir.biketrack.ui.NumberPickerPreference
-            app:key="@string/setting_weight"
-            app:title="@string/weight"
-            app:min_value="1"
-            app:max_value="400"
+        <com.romagmir.biketrack.ui.RangeEditNumberPreference
+            android:key="@string/setting_weight"
+            android:title="@string/height"
+            android:dialogLayout="@layout/preference_edit_text"
+            android:defaultValue="80"
+            android:min="1"
+            android:max="400"
             app:suffix="Kg"
-            app:initial_value="80"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"/>
 
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/weekly_objectives">
+        <SwitchPreference
+            android:key="@string/setting_enable_weekly"
+            android:title="@string/weekly_enable"
+            android:defaultValue="false" />
+
+        <com.romagmir.biketrack.ui.RangeEditNumberPreference
+            android:key="@string/setting_weekly_calories"
+            android:title="@string/weekly_calories"
+            android:dialogLayout="@layout/preference_edit_text"
+            android:defaultValue="1800"
+            app:suffix="Kcal"
+            app:useSimpleSummaryProvider="true"
+            android:dependency="@string/setting_enable_weekly" />
+
+        <com.romagmir.biketrack.ui.RangeEditNumberPreference
+            app:key="@string/setting_weekly_hours"
+            app:title="@string/weekly_hours"
+            android:dialogLayout="@layout/preference_edit_text"
+            android:defaultValue="2"
+            android:min="1"
+            android:max="168"
+            app:suffix="H"
+            app:useSimpleSummaryProvider="true"
+            android:dependency="@string/setting_enable_weekly" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/data_gathering">

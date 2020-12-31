@@ -39,6 +39,10 @@
     <string name="your_info_header">Le tue informazioni</string>
     <string name="height">Altezza</string>
     <string name="weight">Peso</string>
+    <string name="weekly_objectives">I tuoi obiettivi settimanali</string>
+    <string name="weekly_enable">Abilita gli obiettivi settimanali</string>
+    <string name="weekly_calories">Calorie bruciate</string>
+    <string name="weekly_hours">Ore di allenamento</string>
     <string name="data_gathering">Impostazioni di raccolta</string>
     <string name="recording_resolution">Risoluzione registrazione (punti al secondo)</string>
     <string name="keep_awake">Schermo attivo durante la registrazione</string>

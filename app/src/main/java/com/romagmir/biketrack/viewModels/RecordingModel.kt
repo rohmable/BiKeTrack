@@ -94,15 +94,12 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
         if (!running) return
         val track = trackRecorder.stop()
         // Retrieve user info for watts calculation
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication())
-        val height = sharedPreferences.getInt(
-            getApplication<Application>().getString(R.string.setting_height),
-            180
-        ).toDouble()
-        val weight = sharedPreferences.getInt(
-            getApplication<Application>().getString(R.string.setting_weight),
-            80
-        ).toDouble()
+        var height = 180.0
+        var weight = 80.0
+        with(PreferenceManager.getDefaultSharedPreferences(getApplication())) {
+            getString(getSettingKey(R.string.setting_height), "180")?.let { height = it.toDouble() }
+            getString(getSettingKey(R.string.setting_weight), "80")?.let { weight = it.toDouble() }
+        }
 
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -159,6 +156,10 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
                 return ""
             }
         }
+    }
+
+    private fun getSettingKey(resId: Int): String {
+        return getApplication<Application>().getString(resId)
     }
 
     /**
