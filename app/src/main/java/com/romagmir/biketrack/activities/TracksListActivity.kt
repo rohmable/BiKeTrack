@@ -39,6 +39,14 @@ class TracksListActivity : FirebaseUserActivity() {
         trackAdapter.trackAdapterListener = trackAdapterListener
         binding.trackList.adapter = trackAdapter
 
+        // Settings menu
+        binding.toolbar.inflateMenu(R.menu.main_menu)
+        binding.toolbar.setOnMenuItemClickListener(menuItemListener)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
         // Set up welcome card
         user?.let {
             binding.welcomeCard.userName = it.displayName.toString()
@@ -49,10 +57,6 @@ class TracksListActivity : FirebaseUserActivity() {
             binding.welcomeCard.hoursObjective = preferences.getString(getString(R.string.setting_weekly_hours), "0f")?.toFloat() ?: 0f
             binding.welcomeCard.showWeekly = preferences.getBoolean(getString(R.string.setting_enable_weekly), false)
         }
-
-        // Settings menu
-        binding.toolbar.inflateMenu(R.menu.main_menu)
-        binding.toolbar.setOnMenuItemClickListener(menuItemListener)
     }
 
     override fun onUserChanged(

@@ -6,10 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.romagmir.biketrack.R
+import com.romagmir.biketrack.activities.LoginActivity
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 
@@ -77,15 +76,8 @@ open class FirebaseUserActivity : AppCompatActivity() {
                 user = it
             }
         } ?: run {
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .setLogo(R.mipmap.ic_launcher_round)
-                    .setTheme(R.style.Theme_BiKeTrack)
-                    .build(),
-                RC_SIGN_IN
-            )
+            val logIntent = Intent(this, LoginActivity::class.java)
+            startActivityForResult(logIntent, BKTRK_SIGN_IN)
         }
     }
 
@@ -114,13 +106,11 @@ open class FirebaseUserActivity : AppCompatActivity() {
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SIGN_IN) {
-            // Handling login result
-            val response = IdpResponse.fromResultIntent(data)
+        if (requestCode == BKTRK_SIGN_IN) {
             if (resultCode == Activity.RESULT_OK) {
                 user = FirebaseAuth.getInstance().currentUser
             } else {
-                Log.d(TAG, "Log-in failed, cause ${response?.error?.errorCode}")
+                Log.e(TAG, "Log-in failed!")
             }
         }
     }
@@ -133,6 +123,6 @@ open class FirebaseUserActivity : AppCompatActivity() {
         )
         /** Log tag */
         private val TAG = FirebaseUserActivity::class.java.simpleName
-        private const val RC_SIGN_IN = 123
+        private const val BKTRK_SIGN_IN = 101
     }
 }

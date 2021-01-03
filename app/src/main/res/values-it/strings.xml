@@ -47,6 +47,15 @@
     <string name="recording_resolution">Risoluzione registrazione (punti al secondo)</string>
     <string name="keep_awake">Schermo attivo durante la registrazione</string>
 
+    <!--  LoginActivity strings  -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Entra o registrati</string>
+    <string name="welcome_message">Benvenuto in BiKeTrack!
+        \n\nInserisci la tua email ed una password per effettuare il login o registrarti
+        \n\nUna password valida consiste in un minimo di 5 caratteri.
+    </string>
+
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Velocità media</string>
     <string name="avg_watts">Watt medi</string>

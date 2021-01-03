@@ -55,6 +55,15 @@
     <string name="setting_resolution" translatable="false">recording_resolution</string>
     <string name="setting_awake" translatable="false">keep_awake</string>
 
+    <!--  LoginActivity strings  -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="welcome_message">Welcome to BiKeTrack!
+        \n\nPlease enter your email and your password to log in or register.
+        \n\nA valid password consist of a minimum of 5 characters.
+    </string>
+
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Average speed</string>
     <string name="avg_watts">Average watts</string>

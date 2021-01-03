@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseUser
 import com.jjoe64.graphview.DefaultLabelFormatter
