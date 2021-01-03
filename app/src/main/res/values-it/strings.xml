@@ -55,6 +55,10 @@
     <string name="elevation_gain">Dislivello</string>
     <string name="calories_burned">Calorie bruciate</string>
 
+    <!--  WelcomeCard strings  -->
+    <string name="welcome_format">Benvenuto, %1$s!</string>
+    <string name="welcome_anonymous">Benvenuto, effettua il login per poter utilizzare l\'app</string>
+
     <!--  RemoveTrackDialog strings  -->
     <string name="dialog_text">Sei sicuro di voler rimuovere questo percorso?</string>
     <string name="dialog_confirm">Sì</string>

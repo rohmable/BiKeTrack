@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.observe
+import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTracksListBinding
@@ -12,7 +14,9 @@ import com.romagmir.biketrack.model.Track
 import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.ui.RemoveTrackDialog
 import com.romagmir.biketrack.ui.TracksAdapter
+import com.romagmir.biketrack.utils.PreferencesSynchronizer
 import com.romagmir.biketrack.viewModels.TracksModel
+import java.util.*
 import kotlin.reflect.KProperty
 
 /**
@@ -35,6 +39,17 @@ class TracksListActivity : FirebaseUserActivity() {
         trackAdapter.trackAdapterListener = trackAdapterListener
         binding.trackList.adapter = trackAdapter
 
+        // Set up welcome card
+        user?.let {
+            binding.welcomeCard.userName = it.displayName.toString()
+            val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+            val prefSynchronizer = PreferencesSynchronizer(this, it, preferences)
+            prefSynchronizer.download()
+            binding.welcomeCard.caloriesObjective = preferences.getString(getString(R.string.setting_weekly_calories), "0f")?.toFloat() ?: 0f
+            binding.welcomeCard.hoursObjective = preferences.getString(getString(R.string.setting_weekly_hours), "0f")?.toFloat() ?: 0f
+            binding.welcomeCard.showWeekly = preferences.getBoolean(getString(R.string.setting_enable_weekly), false)
+        }
+
         // Settings menu
         binding.toolbar.inflateMenu(R.menu.main_menu)
         binding.toolbar.setOnMenuItemClickListener(menuItemListener)
@@ -55,10 +70,30 @@ class TracksListActivity : FirebaseUserActivity() {
                     .get(TracksModel::class.java)
 
                 Log.d(TAG, "TracksModel created, now observing tracks")
-                tracksModel.tracks.observe(this) { tracks ->
-                    trackAdapter.tracks = tracks
-                }
+                tracksModel.tracks.observe(this) { tracks -> updateTracks(tracks) }
             }
+        }
+    }
+
+    /**
+     * Updates the UI using the given track list.
+     *
+     * @param tracks Tracks to display
+     */
+    private fun updateTracks(tracks: List<Track>) {
+        trackAdapter.tracks = tracks
+        if (binding.welcomeCard.showWeekly) {
+            val calendar = Calendar.getInstance()
+            calendar.time = Date()
+            val week = calendar.get(Calendar.WEEK_OF_YEAR)
+            var hours = 0.0
+            var calories = 0.0
+            tracks.asSequence().filter { calendar.time = it.date; calendar.get(Calendar.WEEK_OF_YEAR) == week }.forEach { track ->
+                hours += track.hoursLength
+                calories += track.calories
+            }
+            binding.welcomeCard.hoursDone = hours.toFloat()
+            binding.welcomeCard.caloriesDone = calories.toFloat()
         }
     }
 
