@@ -33,36 +33,28 @@ class WelcomeCard(context: Context, attrs: AttributeSet) :
     var hoursDone = 0f
     set(value) {
         field = value
-        if (showWeekly) {
-            updateHours()
-        }
+        updateHours()
     }
 
     /** Hours of training to do in the current week */
     var hoursObjective = 0f
     set(value) {
         field = value
-        if (showWeekly) {
-            updateHours()
-        }
+        updateHours()
     }
 
     /** Calories burned in the current week */
     var caloriesDone = 0f
     set(value) {
         field = value
-        if (showWeekly) {
-            updateCalories()
-        }
+        updateCalories()
     }
 
     /** Calories to burn in the current week */
     var caloriesObjective = 0f
     set (value) {
         field = value
-        if (showWeekly) {
-            updateCalories()
-        }
+        updateCalories()
     }
 
     /**

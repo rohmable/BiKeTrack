@@ -7,7 +7,6 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.observe
-import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.romagmir.biketrack.R
@@ -51,7 +50,7 @@ class TracksListActivity : AppCompatActivity() {
 
         tracksModel = ViewModelProviders.of(this, TracksModel.TracksModelFactory(application, user))
             .get(TracksModel::class.java)
-        tracksModel.tracks.observe(this) { tracks -> updateTracks(tracks) }
+        tracksModel.tracks.observe(this) { tracks -> trackAdapter.tracks = tracks }
 
         // Settings menu
         binding.toolbar.inflateMenu(R.menu.main_menu)
@@ -62,35 +61,38 @@ class TracksListActivity : AppCompatActivity() {
         super.onStart()
 
         // Set up welcome card
+        val settingWeeklyCalories = getString(R.string.setting_weekly_calories)
+        val settingWeeklyHours = getString(R.string.setting_weekly_hours)
+        val settingEnableWeekly = getString(R.string.setting_enable_weekly)
         binding.welcomeCard.userName = user.displayName.toString()
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val prefSynchronizer = PreferencesSynchronizer(this, user, preferences)
-        prefSynchronizer.download()
-        binding.welcomeCard.caloriesObjective = preferences.getString(getString(R.string.setting_weekly_calories), "0f")?.toFloat() ?: 0f
-        binding.welcomeCard.hoursObjective = preferences.getString(getString(R.string.setting_weekly_hours), "0f")?.toFloat() ?: 0f
-        binding.welcomeCard.showWeekly = preferences.getBoolean(getString(R.string.setting_enable_weekly), false)
+        val prefSynchronizer = PreferencesSynchronizer(this, user)
+        prefSynchronizer.download { preferences ->
+            binding.welcomeCard.caloriesObjective = preferences.getString(settingWeeklyCalories, "0f")?.toFloat() ?: 0f
+            binding.welcomeCard.hoursObjective = preferences.getString(settingWeeklyHours, "0f")?.toFloat() ?: 0f
+            binding.welcomeCard.showWeekly = preferences.getBoolean(settingEnableWeekly, false)
+            tracksModel.tracks.observe(this) { tracks -> updateWelcomeCard(tracks)}
+        }
     }
 
     /**
-     * Updates the UI using the given track list.
+     * Updates the welcome card aggregates using the given track list.
      *
-     * @param tracks Tracks to display
+     * @param tracks Tracks to aggregate
      */
-    private fun updateTracks(tracks: List<Track>) {
-        trackAdapter.tracks = tracks
-        if (binding.welcomeCard.showWeekly) {
-            val calendar = Calendar.getInstance()
-            calendar.time = Date()
-            val week = calendar.get(Calendar.WEEK_OF_YEAR)
-            var hours = 0.0
-            var calories = 0.0
-            tracks.asSequence().filter { calendar.time = it.date; calendar.get(Calendar.WEEK_OF_YEAR) == week }.forEach { track ->
+    private fun updateWelcomeCard(tracks: List<Track>) {
+        val calendar = Calendar.getInstance()
+        calendar.time = Date()
+        val week = calendar.get(Calendar.WEEK_OF_YEAR)
+        var hours = 0.0
+        var calories = 0.0
+        tracks.asSequence()
+            .filter { calendar.time = it.date; calendar.get(Calendar.WEEK_OF_YEAR) == week }
+            .forEach { track ->
                 hours += track.hoursLength
                 calories += track.calories
-            }
-            binding.welcomeCard.hoursDone = hours.toFloat()
-            binding.welcomeCard.caloriesDone = calories.toFloat()
         }
+        binding.welcomeCard.hoursDone = hours.toFloat()
+        binding.welcomeCard.caloriesDone = calories.toFloat()
     }
 
     /**
@@ -107,7 +109,10 @@ class TracksListActivity : AppCompatActivity() {
 
     private val trackAdapterListener = object : TracksAdapter.TrackAdapterListener {
         override fun onOpen(track: Track) {
-            val openIntent = Intent(this@TracksListActivity, TrackDetailActivity::class.java)
+            val openIntent = Intent(
+                this@TracksListActivity,
+                TrackDetailActivity::class.java
+            )
             openIntent.putExtra(TRACK_KEY, track)
             Log.d(TAG, "Opening $track")
             startActivity(openIntent)

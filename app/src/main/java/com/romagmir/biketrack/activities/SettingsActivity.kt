@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        sync = PreferencesSynchronizer(this, user, preferences)
+        sync = PreferencesSynchronizer(this, user)
 
         // Enable the "back arrow" on the toolbar to go back to the previous activity
         setSupportActionBar(findViewById(R.id.toolbar))
