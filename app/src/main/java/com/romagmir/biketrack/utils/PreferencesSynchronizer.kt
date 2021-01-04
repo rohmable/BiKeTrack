@@ -38,9 +38,6 @@ class PreferencesSynchronizer(val context: Context, user: FirebaseUser, private 
 
     /**
      * Start downloading preferences data.
-     *
-     * This operation is asynchronous due to the use of the [android.content.SharedPreferences.Editor.apply()]
-     * method.
      */
     fun download() {
         Log.d(TAG, "Downloading settings for user ${user.uid}")
