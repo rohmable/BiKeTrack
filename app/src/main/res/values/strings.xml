@@ -63,6 +63,7 @@
         \n\nPlease enter your email and your password to log in or register.
         \n\nA valid password consist of a minimum of 5 characters.
     </string>
+    <string name="login_failed">Login failed!</string>
 
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Average speed</string>

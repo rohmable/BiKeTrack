@@ -55,6 +55,7 @@
         \n\nInserisci la tua email ed una password per effettuare il login o registrarti
         \n\nUna password valida consiste in un minimo di 5 caratteri.
     </string>
+    <string name="login_failed">Impossibile effettuare il login!</string>
 
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Velocità media</string>

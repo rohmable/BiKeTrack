@@ -6,28 +6,30 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.jjoe64.graphview.DefaultLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.TrackRecorder
 import com.romagmir.biketrack.databinding.ActivityRecordBinding
-import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.viewModels.RecordingModel
 import kotlin.math.max
-import kotlin.reflect.KProperty
 
 /**
  * Used to record a [Track][com.romagmir.biketrack.model.Track]
  */
-class RecordActivity : FirebaseUserActivity() {
+class RecordActivity : AppCompatActivity() {
     /** Flag used to check if the location permission was granted by the user */
     private var locationPermissionGranted = false
+    /** Logged user */
+    private lateinit var user: FirebaseUser
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
     private lateinit var binding: ActivityRecordBinding
     /** Recording [ViewModel][androidx.lifecycle.ViewModel] used to store data during the whole app lifecycle */
@@ -46,6 +48,14 @@ class RecordActivity : FirebaseUserActivity() {
         binding = ActivityRecordBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        FirebaseAuth.getInstance().currentUser?.let {
+            user = it
+        } ?: run {
+            finish()
+        }
+        recordingModel = ViewModelProviders.of(this, RecordingModel.RecordingModelFactory(application, user))
+            .get(RecordingModel::class.java)
 
         // Enable the "back arrow" on the toolbar to go back to the previous activity
         setSupportActionBar(binding.toolbar)
@@ -110,32 +120,6 @@ class RecordActivity : FirebaseUserActivity() {
     override fun onPause() {
         super.onPause()
         recordingModel.removeTrackRecorderListener()
-    }
-
-    /**
-     * Called when the user has changed.
-     *
-     * The value of the user has already been changed when this callback is invoked.
-     *
-     * @param property Property that called the method.
-     * @param oldValue Previous user.
-     * @param newValue New user.
-     */
-    override fun onUserChanged(
-        property: KProperty<*>,
-        oldValue: FirebaseUser?,
-        newValue: FirebaseUser?
-    ) {
-        super.onUserChanged(property, oldValue, newValue)
-
-        newValue?.let {
-            if (this::recordingModel.isInitialized) {
-                recordingModel.user = it
-            } else {
-                recordingModel = ViewModelProviders.of(this, RecordingModel.RecordingModelFactory(application, it))
-                    .get(RecordingModel::class.java)
-            }
-        }
     }
 
     /**

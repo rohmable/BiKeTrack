@@ -1,12 +1,15 @@
 package com.romagmir.biketrack.activities
 
 import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import com.google.firebase.auth.FirebaseAuth
+import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
@@ -38,8 +41,7 @@ class LoginActivity : AppCompatActivity() {
         // If the user is already logged in return successfully
         FirebaseAuth.getInstance().currentUser?.let {
             Log.d(TAG, "User \"${it.displayName}\" is already logged in")
-            setResult(RESULT_OK)
-            finish()
+            logged()
         }
     }
 
@@ -51,18 +53,33 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) {task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "Login successful!")
-                    setResult(RESULT_OK)
-                    finish()
+                    logged()
                 } else {
+                    Toast.makeText(this, R.string.login_failed, Toast.LENGTH_LONG).show()
                     Log.d(TAG, "Login failed!")
-                    setResult(Activity.RESULT_CANCELED)
-                    finish()
+                    reset()
                 }
         }
         // While the Firebase framework tries to authenticate the user show
         // a progress bar in place of the login button
         binding.btnLogin.visibility = View.GONE
         binding.prgLoading.visibility = View.VISIBLE
+    }
+
+    private fun reset() {
+        // Reset the UI to allow another login
+        binding.txtPassword.text.clear()
+        binding.btnLogin.visibility = View.VISIBLE
+        binding.prgLoading.visibility = View.GONE
+    }
+
+    /**
+     * Called to start the main activity after a successful login
+     */
+    private fun logged() {
+        val tracksListIntent = Intent(this, TracksListActivity::class.java)
+        startActivity(tracksListIntent)
+        reset()
     }
 
     companion object {

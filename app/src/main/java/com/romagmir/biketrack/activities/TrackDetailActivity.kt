@@ -4,12 +4,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.SeekBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.jjoe64.graphview.DefaultLabelFormatter
 import com.jjoe64.graphview.series.DataPoint
@@ -19,18 +21,18 @@ import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTrackDetailBinding
 import com.romagmir.biketrack.model.Position
 import com.romagmir.biketrack.model.Track
-import com.romagmir.biketrack.ui.FirebaseUserActivity
 import com.romagmir.biketrack.viewModels.TrackDetailModel
 import kotlin.math.ln
 import kotlin.math.max
-import kotlin.reflect.KProperty
 
 /**
  * Shows the details of a [Track].
  */
-class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
+class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
     private lateinit var binding: ActivityTrackDetailBinding
+    /** Logged user */
+    private lateinit var user: FirebaseUser
     /** [ViewModel][androidx.lifecycle.ViewModel] used to store data during the whole app lifecycle */
     private lateinit var trackDetailModel: TrackDetailModel
     /** Map that is shown on the top of the activity */
@@ -61,6 +63,14 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        FirebaseAuth.getInstance().currentUser?.let {
+            user = it
+        } ?: run {
+            finish()
+        }
+        trackDetailModel = ViewModelProviders.of(this, TrackDetailModel.TrackDetailModelFactory(application, user))
+            .get(TrackDetailModel::class.java)
 
         // Enable the "back arrow" on the toolbar to go back to the previous activity
         setSupportActionBar(binding.toolbar)
@@ -97,23 +107,6 @@ class TrackDetailActivity : FirebaseUserActivity(), OnMapReadyCallback {
 
         // Setup listeners
         binding.detailSelector.setOnSeekBarChangeListener(detailSeekbarChangeListener)
-    }
-
-    override fun onUserChanged(
-        property: KProperty<*>,
-        oldValue: FirebaseUser?,
-        newValue: FirebaseUser?
-    ) {
-        super.onUserChanged(property, oldValue, newValue)
-
-        newValue?.let {
-            if (this::trackDetailModel.isInitialized) {
-                trackDetailModel.user = it
-            } else {
-                trackDetailModel = ViewModelProviders.of(this, TrackDetailModel.TrackDetailModelFactory(application, it))
-                    .get(TrackDetailModel::class.java)
-            }
-        }
     }
 
     /**
