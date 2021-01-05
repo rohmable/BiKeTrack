@@ -26,8 +26,6 @@ import kotlin.math.max
  * Used to record a [Track][com.romagmir.biketrack.model.Track]
  */
 class RecordActivity : AppCompatActivity() {
-    /** Flag used to check if the location permission was granted by the user */
-    private var locationPermissionGranted = false
     /** Logged user */
     private lateinit var user: FirebaseUser
     /** [ViewBinding][androidx.viewbinding.ViewBinding] used to interact with the children views */
@@ -56,10 +54,6 @@ class RecordActivity : AppCompatActivity() {
         }
         recordingModel = ViewModelProviders.of(this, RecordingModel.RecordingModelFactory(application, user))
             .get(RecordingModel::class.java)
-
-        // Enable the "back arrow" on the toolbar to go back to the previous activity
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Setup activity default data
         binding.txtTime.text = getString(R.string.time_format, 0, 0, 0)
@@ -110,10 +104,17 @@ class RecordActivity : AppCompatActivity() {
             binding.recordGraph.visibility = View.VISIBLE
             binding.lytLegend.visibility = View.VISIBLE
         }
+
+        // Enable the "back arrow" on the toolbar to go back to the previous activity
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onResume() {
         super.onResume()
+        if (!recordingModel.locationPermissionGranted) {
+            getLocationPermission()
+        }
         recordingModel.addTrackRecorderListener(recorderListener)
     }
 
@@ -144,10 +145,6 @@ class RecordActivity : AppCompatActivity() {
      */
     private fun startTrack() {
         Log.v(TAG, "Start recording")
-
-        if (!locationPermissionGranted) {
-            getLocationPermission()
-        }
         recordingModel.startRecording()
     }
 
@@ -227,7 +224,7 @@ class RecordActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this.applicationContext,
                 Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
-            locationPermissionGranted = true
+            recordingModel.locationPermissionGranted = true
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
@@ -249,10 +246,10 @@ class RecordActivity : AppCompatActivity() {
                                             permissions: Array<out String>,
                                             grantResults: IntArray) {
         // Handling location permission request
-        locationPermissionGranted = false
+        recordingModel.locationPermissionGranted = false
         when (requestCode) {
             PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION ->
-                locationPermissionGranted = (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                recordingModel.locationPermissionGranted = (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
         }
     }
 

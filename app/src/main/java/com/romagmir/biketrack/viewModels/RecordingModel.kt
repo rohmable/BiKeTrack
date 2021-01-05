@@ -39,6 +39,8 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
     val altitudeSeries = LineGraphSeries<DataPoint>()
     /** Shows the speed variation on a graph */
     val speedSeries = LineGraphSeries<DataPoint>()
+    /** Flag used to check if the location permission was granted by the user */
+    var locationPermissionGranted = false
 
     init {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -79,9 +81,9 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
     @SuppressLint("MissingPermission")
     fun startRecording(): Boolean {
         if (running) return false
-        trackRecorder.start(genTrackName())
         altitudeSeries.resetData(arrayOf())
         speedSeries.resetData(arrayOf())
+        trackRecorder.start(genTrackName())
         return true
     }
 
