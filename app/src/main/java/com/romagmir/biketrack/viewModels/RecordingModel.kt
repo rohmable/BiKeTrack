@@ -2,6 +2,7 @@ package com.romagmir.biketrack.viewModels
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -13,9 +14,7 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.TrackRecorder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.time.ZonedDateTime
 
 /**
@@ -43,12 +42,9 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
     var locationPermissionGranted = false
 
     init {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val recordingResolution = sharedPreferences.getInt(
-            context.getString(R.string.setting_resolution),
-            6
-        )
-        trackRecorder.recordingResolution = recordingResolution
+        with(PreferenceManager.getDefaultSharedPreferences(context)) {
+            trackRecorder.recordingResolution = getInt(getSettingKey(R.string.setting_resolution), 6)
+        }
 
         // Setting up graph series
         with(altitudeSeries) {
@@ -65,9 +61,11 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
     }
 
     override fun onCleared() {
-        super.onCleared()
         // Stop the actual recording (if any)
-        stopRecording()
+        Log.d(TAG, "Received onCleared, stopping recording")
+        stopRecording(GlobalScope)
+
+        super.onCleared()
     }
 
     /**
@@ -92,18 +90,19 @@ class RecordingModel(context: Application, var user: FirebaseUser) : AndroidView
      *
      * If there is no track being recorded then nothing is done.
      */
-    fun stopRecording() {
+    fun stopRecording(scope: CoroutineScope = viewModelScope) {
         if (!running) return
         val track = trackRecorder.stop()
         // Retrieve user info for watts calculation
         var height = 180.0
         var weight = 80.0
+        Log.d(TAG, "Stopping recording")
         with(PreferenceManager.getDefaultSharedPreferences(getApplication())) {
             getString(getSettingKey(R.string.setting_height), "180")?.let { height = it.toDouble() }
             getString(getSettingKey(R.string.setting_weight), "80")?.let { weight = it.toDouble() }
         }
 
-        viewModelScope.launch {
+        scope.launch {
             withContext(Dispatchers.IO) {
                 val tracksDb = FirebaseDatabase.getInstance().reference.child("tracks").child(user.uid)
                 val newVal = tracksDb.push()

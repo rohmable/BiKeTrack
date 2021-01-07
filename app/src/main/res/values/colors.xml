@@ -17,4 +17,5 @@
     <color name="altitude_color">#3949AB</color>
     <color name="altitude_background_color">#A43949AB</color>
     <color name="speed_color">#D81B60</color>
+    <color name="polyline_color">#FF0000</color>
 </resources>

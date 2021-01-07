@@ -1,6 +1,5 @@
 package com.romagmir.biketrack.activities
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -23,7 +22,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         // Add input validators
         binding.txtUsername.addTextChangedListener {
@@ -38,10 +36,13 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        setContentView(R.layout.splash_screen)
         // If the user is already logged in return successfully
         FirebaseAuth.getInstance().currentUser?.let {
             Log.d(TAG, "User \"${it.displayName}\" is already logged in")
             logged()
+        } ?: run {
+            setContentView(binding.root)
         }
     }
 

@@ -56,9 +56,8 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.splash_screen)
         binding = ActivityTrackDetailBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -120,6 +119,9 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         trackDetailModel.track.observe(this) {
             updateTrackData(it)
             drawLine(it)
+            if (it.positions.isNotEmpty()) {
+                setContentView(binding.root)
+            }
         }
     }
 
@@ -164,27 +166,24 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     private fun drawLine(track: Track) {
         Log.d(TAG, "Drawing track route on map")
-        track.positions.let { positions ->
-            if (positions.isEmpty()) return
-            // Draw polyline using the coordinates included in the track in pairs
-            val options = PolylineOptions().width(5f).color(Color.RED)
-            val boundBuilder = LatLngBounds.builder()
-            positions.zipWithNext().forEach { (start, end) ->
-                options.add(start.toLatLng(), end.toLatLng())
-                boundBuilder.include(start.toLatLng())
-            }
-            mMap.addPolyline(options)
-            val bounds = boundBuilder.build()
-
-            // Set the map view to display the whole track
-            // The center position is calculated by boundBuilder
-            // The formula below is used to calculate the zoom level that includes the whole track
-            val nePos = Position(latitude = bounds.northeast.latitude, longitude = bounds.northeast.longitude)
-            val swPos = Position(latitude = bounds.southwest.latitude, longitude = bounds.southwest.longitude)
-            val scale = Position.distance(nePos, swPos) / 300
-            val zoomLvl = ((16 - ln(scale) / ln(2.0))).toFloat()
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.center, zoomLvl))
+        if (track.positions.isEmpty()) return
+        val options = PolylineOptions().width(5f).color(getColor(R.color.polyline_color))
+        val boundBuilder = LatLngBounds.builder()
+        track.positions.zipWithNext().forEach { (start, end) ->
+            options.add(start.toLatLng(), end.toLatLng())
+            boundBuilder.include(start.toLatLng())
         }
+        mMap.addPolyline(options)
+        val bounds = boundBuilder.build()
+
+        // Set the map view to display the whole track
+        // The center position is calculated by boundBuilder
+        // The formula below is used to calculate the zoom level that includes the whole track
+        val nePos = Position(latitude = bounds.northeast.latitude, longitude = bounds.northeast.longitude)
+        val swPos = Position(latitude = bounds.southwest.latitude, longitude = bounds.southwest.longitude)
+        val scale = Position.distance(nePos, swPos) / 300
+        val zoomLvl = ((16 - ln(scale) / ln(2.0))).toFloat()
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.center, zoomLvl))
     }
 
     /**
