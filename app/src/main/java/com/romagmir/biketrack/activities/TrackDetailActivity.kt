@@ -59,8 +59,8 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.splash_screen)
         binding = ActivityTrackDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -74,14 +74,9 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         trackDetailModel = ViewModelProviders.of(this, TrackDetailModel.TrackDetailModelFactory(application, user))
             .get(TrackDetailModel::class.java)
 
-        // Enable the "back arrow" on the toolbar to go back to the previous activity
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         // Start retrieving the details of the given track (if any)
         track = intent.extras?.getParcelable(TracksListActivity.TRACK_KEY) ?: Track()
-        binding.detailToolbar?.title = track.name
-        trackDetailModel.getDetails(track)
+        binding.detailToolbar.title = track.name
 
         // Setup the various graph views
         binding.detailGraph.gridLabelRenderer.labelFormatter = graphLabelFormatter
@@ -110,10 +105,10 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         // Setup listeners
         binding.detailSelector.setOnSeekBarChangeListener(detailSeekbarChangeListener)
 
-        // Settings menu
+        // Enable the "back arrow" on the toolbar to go back to the previous activity
         setSupportActionBar(binding.detailToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.detailToolbar?.setOnMenuItemClickListener(menuItemListener)
+        binding.detailToolbar.setOnMenuItemClickListener(menuItemListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -129,6 +124,7 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        if (!trackDetailModel.trackRetrieved) trackDetailModel.getDetails(track)
         trackDetailModel.track.observe(this) {
             updateTrackData(it)
             drawLine(it)

@@ -37,6 +37,9 @@ class TrackDetailModel(context: Application, user: FirebaseUser) : AndroidViewMo
     val track: MutableLiveData<Track> by lazy {
         MutableLiveData<Track>()
     }
+    private var _trackRetrieved = false
+    val trackRetrieved: Boolean
+    get() = _trackRetrieved
 
     /**
      * Retrieves the details for the given track.
@@ -52,7 +55,8 @@ class TrackDetailModel(context: Application, user: FirebaseUser) : AndroidViewMo
         this.track.postValue(track)
         database = database.child(track.key)
         // Read values
-        database.addValueEventListener(trackDetailListener)
+        database.addListenerForSingleValueEvent(trackDetailListener)
+        _trackRetrieved = true
     }
 
     /**
