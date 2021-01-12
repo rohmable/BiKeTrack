@@ -3,6 +3,7 @@ package com.romagmir.biketrack.activities
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
@@ -21,7 +22,9 @@ import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityTrackDetailBinding
 import com.romagmir.biketrack.model.Position
 import com.romagmir.biketrack.model.Track
+import com.romagmir.biketrack.ui.RemoveTrackDialog
 import com.romagmir.biketrack.viewModels.TrackDetailModel
+import com.romagmir.biketrack.viewModels.TracksModel
 import kotlin.math.ln
 import kotlin.math.max
 
@@ -77,7 +80,7 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Start retrieving the details of the given track (if any)
         track = intent.extras?.getParcelable(TracksListActivity.TRACK_KEY) ?: Track()
-        binding.toolbar.title = track.name
+        binding.detailToolbar?.title = track.name
         trackDetailModel.getDetails(track)
 
         // Setup the various graph views
@@ -106,6 +109,16 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Setup listeners
         binding.detailSelector.setOnSeekBarChangeListener(detailSeekbarChangeListener)
+
+        // Settings menu
+        setSupportActionBar(binding.detailToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.detailToolbar?.setOnMenuItemClickListener(menuItemListener)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.detail_menu, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     /**
@@ -274,8 +287,22 @@ class TrackDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         override fun onStopTrackingTouch(seekBar: SeekBar?) { }
     }
 
+    private val menuItemListener = androidx.appcompat.widget.Toolbar.OnMenuItemClickListener {
+        when(it.itemId) {
+            R.id.delete -> {
+                val tracksModel = ViewModelProviders.of(this, TracksModel.TracksModelFactory(application, user))
+                        .get(TracksModel::class.java)
+                RemoveTrackDialog(onConfirm = {tracksModel.removeTrack(track); finish()})
+                        .show(supportFragmentManager, CONFIRM_DIAG_TAG)
+            }
+        }
+        false
+    }
+
     companion object {
         /** Log tag */
         private val TAG = TrackDetailActivity::class.java.simpleName
+        /** Tag used to show the [RemoveTrackDialog] dialog */
+        private const val CONFIRM_DIAG_TAG = "CONFIRM_DIAG"
     }
 }

@@ -59,7 +59,7 @@ class TracksAdapter(context: Context, trackList: List<Track> = ArrayList()) :
         binding.txtRowLength.text = context.getString(R.string.length_format, track.length.toFloat()/(3600 * 1000))
         binding.txtRowCalories.text = context.getString(R.string.kcal_format, track.calories)
         binding.cardView.setOnClickListener { trackAdapterListener?.onOpen(track) }
-        binding.imgDelete.setOnClickListener { trackAdapterListener?.onDelete(track) }
+        binding.cardView.setOnLongClickListener { trackAdapterListener?.onDelete(track); false }
         return binding.root
     }
 

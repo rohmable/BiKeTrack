@@ -20,7 +20,6 @@
 
     <!--  TracksListActivity strings  -->
     <string name="track_open">Open</string>
-    <string name="track_delete">Delete</string>
 
     <!--  RecordActivity strings  -->
     <string name="record_track">Record track</string>
@@ -34,6 +33,7 @@
     <!--  TrackDetailActivity strings  -->
     <string name="detail_altitude">Altitude: %1$.1f m</string>
     <string name="detail_speed">Speed: %1$.1f Km/h</string>
+    <string name="detail_delete">Delete</string>
 
     <!--  SettingsActivity strings  -->
     <string name="settings">Settings</string>

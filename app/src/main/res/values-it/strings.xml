@@ -19,7 +19,6 @@
 
     <!--  TracksListActivity strings  -->
     <string name="track_open">Apri</string>
-    <string name="track_delete">Elimina</string>
 
     <!--  RecordActivity strings  -->
     <string name="record_track">Registra percorso</string>
@@ -33,6 +32,7 @@
     <!--  TrackDetailActivity strings  -->
     <string name="detail_altitude">Altitudine: %1$.1f m</string>
     <string name="detail_speed">Velocità: %1$.1f Km/h</string>
+    <string name="detail_delete">Elimina</string>
 
     <!--  SettingsActivity strings  -->
     <string name="settings">Impostazioni</string>
