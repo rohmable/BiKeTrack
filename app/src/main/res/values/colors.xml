@@ -9,11 +9,6 @@
     <color name="primary_text_color">#ffffff</color>
     <color name="secondary_text_color">#ffffff</color>
 
-    <color name="button_color">#00FFFFFF</color>
-    <color name="light_blue_400">#FF29B6F6</color>
-    <color name="light_blue_600">#FF039BE5</color>
-    <color name="gray_400">#FFBDBDBD</color>
-    <color name="gray_600">#FF757575</color>
     <color name="altitude_color">#3949AB</color>
     <color name="altitude_background_color">#A43949AB</color>
     <color name="speed_color">#D81B60</color>
