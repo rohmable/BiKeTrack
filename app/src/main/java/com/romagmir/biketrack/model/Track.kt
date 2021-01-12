@@ -84,6 +84,7 @@ data class Track (
      * @return The power produced by the rider in Watts
      */
     fun calcWatts(weight: Double, height: Double): Double {
+        if (positions.isEmpty()) return 0.0
         // From Heil DP. (European Journal of Applied Physiology, 85:358-366)
         val frontalArea = 0.00433 * SEAT_TUBE_ANGLE.pow(0.183f) * TORSO_ANGLE.pow(0.099f) * weight.pow(0.493) * (height / 100).pow(1.163)
 
@@ -109,7 +110,10 @@ data class Track (
 
         val totWatts = rolling + wind + gravity + acceleration
 
-        return totWatts / (length / 1000)
+        // Avoid dividing by zero
+        val lengthKm = if (length != 0L) length.toDouble() / 1000 else 1.0
+
+        return totWatts / lengthKm
     }
 
     /**

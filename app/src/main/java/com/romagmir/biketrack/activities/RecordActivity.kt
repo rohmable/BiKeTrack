@@ -168,6 +168,7 @@ class RecordActivity : AppCompatActivity() {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@RecordActivity)
             val deviceAwake = sharedPreferences.getBoolean(getString(R.string.setting_awake), true)
             binding.recordRootLayout.keepScreenOn = deviceAwake
+            binding.fabRecord.isClickable = false
             // Show progress bar
             binding.progressBar.visibility = View.VISIBLE
         }
@@ -198,6 +199,7 @@ class RecordActivity : AppCompatActivity() {
             binding.lytLegend.visibility = View.VISIBLE
             binding.fabRecord.setImageResource(R.drawable.ic_baseline_stop_24)
             binding.fabRecord.contentDescription = getString(R.string.stop_recording)
+            binding.fabRecord.isClickable = true
             Toast.makeText(this@RecordActivity, R.string.recording_started, Toast.LENGTH_SHORT).show()
         }
 
