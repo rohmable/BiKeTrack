@@ -58,12 +58,16 @@
     <!--  LoginActivity strings  -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in">Sign up or sign in</string>
     <string name="welcome_message">Welcome to BiKeTrack!
         \n\nPlease enter your email and your password to log in or register.
         \n\nA valid password consist of a minimum of 5 characters.
     </string>
     <string name="login_failed">Login failed!</string>
+
+    <!--  ChooseNicknameActivity strings  -->
+    <string name="prompt_nickname">Nickname</string>
+    <string name="action_next">Next</string>
 
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Average speed</string>

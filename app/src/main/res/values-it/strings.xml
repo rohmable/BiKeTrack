@@ -57,6 +57,10 @@
     </string>
     <string name="login_failed">Impossibile effettuare il login!</string>
 
+    <!--  ChooseNicknameActivity strings  -->
+    <string name="prompt_nickname">Nickname</string>
+    <string name="action_next">Next</string>
+
     <!--  TrackDetailCard strings  -->
     <string name="avg_speed">Velocità media</string>
     <string name="avg_watts">Watt medi</string>

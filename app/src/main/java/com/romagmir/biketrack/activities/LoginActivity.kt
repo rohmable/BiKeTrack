@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityLoginBinding
 
@@ -56,9 +57,22 @@ class LoginActivity : AppCompatActivity() {
                     Log.d(TAG, "Login successful!")
                     logged()
                 } else {
-                    Toast.makeText(this, R.string.login_failed, Toast.LENGTH_LONG).show()
-                    Log.d(TAG, "Login failed!")
-                    reset()
+                    // Try to register the user
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, psw)
+                        .addOnCompleteListener(this) { registerTask ->
+                            if (registerTask.isSuccessful) {
+                                Log.d(TAG, "User registered successfully!")
+                                // Start activity to ask for the nickname
+                                val nicknameIntent = Intent(this, ChooseNicknameActivity::class.java)
+                                nicknameIntent.putExtra(MAIL_KEY, email)
+                                startActivity(nicknameIntent)
+                                reset()
+                            } else {
+                                Toast.makeText(this, R.string.login_failed, Toast.LENGTH_LONG).show()
+                                Log.d(TAG, "Login failed!")
+                                reset()
+                            }
+                        }
                 }
         }
         // While the Firebase framework tries to authenticate the user show
@@ -86,5 +100,7 @@ class LoginActivity : AppCompatActivity() {
     companion object {
         /** Logging tag */
         private val TAG = LoginActivity::class.java.simpleName
+
+        const val MAIL_KEY = "MAIL"
     }
 }
