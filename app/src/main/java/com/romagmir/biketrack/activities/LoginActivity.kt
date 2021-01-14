@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.romagmir.biketrack.R
 import com.romagmir.biketrack.databinding.ActivityLoginBinding
@@ -57,28 +59,41 @@ class LoginActivity : AppCompatActivity() {
                     Log.d(TAG, "Login successful!")
                     logged()
                 } else {
-                    // Try to register the user
-                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, psw)
-                        .addOnCompleteListener(this) { registerTask ->
-                            if (registerTask.isSuccessful) {
-                                Log.d(TAG, "User registered successfully!")
-                                // Start activity to ask for the nickname
-                                val nicknameIntent = Intent(this, ChooseNicknameActivity::class.java)
-                                nicknameIntent.putExtra(MAIL_KEY, email)
-                                startActivity(nicknameIntent)
-                                reset()
-                            } else {
-                                Toast.makeText(this, R.string.login_failed, Toast.LENGTH_LONG).show()
-                                Log.d(TAG, "Login failed!")
-                                reset()
-                            }
+                    when(task.exception) {
+                        is FirebaseAuthInvalidCredentialsException -> {
+                            Toast.makeText(this, R.string.login_failed, Toast.LENGTH_LONG).show()
+                            Log.d(TAG, "Login failed!")
+                            reset()
                         }
+                        is FirebaseAuthInvalidUserException -> {
+                            // Try to register the user
+                            register(email, psw)
+                        }
+                    }
                 }
         }
         // While the Firebase framework tries to authenticate the user show
         // a progress bar in place of the login button
         binding.btnLogin.visibility = View.GONE
         binding.prgLoading.visibility = View.VISIBLE
+    }
+
+    private fun register(email: String, password: String) {
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "User registered successfully!")
+                        // Start activity to ask for the nickname
+                        val nicknameIntent = Intent(this, ChooseNicknameActivity::class.java)
+                        nicknameIntent.putExtra(MAIL_KEY, email)
+                        startActivity(nicknameIntent)
+                        reset()
+                    } else {
+                        Toast.makeText(this, R.string.login_failed, Toast.LENGTH_LONG).show()
+                        Log.e(TAG, "Login failed!", task.exception)
+                        reset()
+                    }
+                }
     }
 
     private fun reset() {
